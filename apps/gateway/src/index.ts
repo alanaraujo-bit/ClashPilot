@@ -1,9 +1,11 @@
 import Fastify from "fastify";
 import { parsePlayerTag } from "@clashpilot/core";
+import cron from "node-cron";
 import { z } from "zod";
 import { CocApiClient } from "./coc/client.js";
 import { loadConfig } from "./config.js";
 import { SIGNATURE_HEADER, TIMESTAMP_HEADER, canonicalBody, verify } from "./http/hmac.js";
+import { syncAllPlayers, syncSinglePlayer } from "./sync/sync-service.js";
 
 const config = loadConfig();
 const coc = new CocApiClient(config);
@@ -87,6 +89,41 @@ app.post("/players/:tag/verify", async (req, reply) => {
 
   return { verified: result.value };
 });
+
+/** Sync sob demanda de um jogador — o botão "atualizar" da web, com throttle de 60 s. */
+app.post("/sync/player/:id", async (req, reply) => {
+  const params = z.object({ id: z.string().min(1) }).parse(req.params);
+  const outcome = await syncSinglePlayer(coc, app.log, params.id);
+  if (outcome.throttled) return reply.code(429).send({ error: "sincronizado há pouco" });
+  if (!outcome.ok) return reply.code(502).send({ error: "não foi possível sincronizar" });
+  return { ok: true, events: outcome.events };
+});
+
+/** Gatilho manual da rodada completa — usado no primeiro deploy e para depuração. */
+app.post("/sync/all", async (_req, reply) => {
+  const stats = await syncAllPlayers(coc, app.log);
+  return reply.send(stats);
+});
+
+/**
+ * Sincronização diária às 03:10 UTC (fora do horário de pico das temporadas).
+ *
+ * Roda no processo do gateway — nada de serverless para trabalho de fundo. A frequência
+ * adaptativa por jogador (docs/05-sync-e-cache.md §1.2) entra depois; a base diária já garante
+ * que nenhum histórico é perdido, que é o requisito que não dá para recuperar.
+ */
+if (config.NODE_ENV === "production") {
+  cron.schedule(
+    "10 3 * * *",
+    () => {
+      void syncAllPlayers(coc, app.log).catch((error) =>
+        app.log.error({ error }, "rodada diária de sync falhou"),
+      );
+    },
+    { timezone: "UTC" },
+  );
+  app.log.info("cron de sincronização diária agendado (03:10 UTC)");
+}
 
 try {
   await app.listen({ port: config.PORT, host: config.HOST });

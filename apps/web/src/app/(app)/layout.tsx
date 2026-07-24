@@ -21,6 +21,9 @@ export default async function AppLayout({ children }: { readonly children: React
               <Link href="/plano" className="hover:underline underline-offset-4">
                 Plano
               </Link>
+              <Link href="/timeline" className="hover:underline underline-offset-4">
+                Timeline
+              </Link>
               <Link href="/vila" className="hover:underline underline-offset-4">
                 Minha vila
               </Link>

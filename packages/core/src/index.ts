@@ -5,5 +5,6 @@ export * from "./domain/progress/max-progress.js";
 export * from "./domain/progress/ledger.js";
 export * from "./domain/planning/priority-engine.js";
 export * from "./domain/planning/time-to-max.js";
+export * from "./domain/history/diff.js";
 export * from "./domain/progress/village-score.js";
 export * from "./domain/ports/index.js";

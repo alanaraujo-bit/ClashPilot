@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { MaxProgressBar } from "@/components/dashboard/max-progress-bar";
 import { StatTile } from "@/components/dashboard/stat-tile";
+import { RefreshButton } from "@/components/dashboard/refresh-button";
 import { Button } from "@/components/ui/button";
 import { formatNumber } from "@/lib/utils";
 import { getPrimaryPlayer } from "@/server/session";
@@ -55,9 +56,12 @@ export default async function DashboardPage() {
             {current.clanName ? ` · ${current.clanName}` : ""}
           </p>
         </div>
-        <Link href="/link-player">
-          <Button variant="secondary">Vincular outra vila</Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          <RefreshButton playerId={player.id} />
+          <Link href="/link-player">
+            <Button variant="secondary">Vincular outra vila</Button>
+          </Link>
+        </div>
       </header>
 
       <MaxProgressBar
