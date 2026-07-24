@@ -22,6 +22,10 @@ const raw = {
   achievements: [
     { name: "Empire Builder", stars: 3, value: 9, target: 10, village: "home" },
     { name: "Bigger Coffers", stars: 3, value: 14, target: 15, village: "home" },
+    // Valor real, não documentado, visto no primeiro payload de produção.
+    { name: "Aggressive Capitalism", stars: 3, value: 1200, target: 1500, village: "clanCapital" },
+    // Escopo hipotético de um update futuro: não pode derrubar o parsing.
+    { name: "Escopo Novo", stars: 0, value: 0, target: 1, village: "somethingNew" },
   ],
   troops: [
     { name: "Barbarian", level: 10, maxLevel: 12, village: "home" },
@@ -86,6 +90,13 @@ describe("mapPlayer", () => {
 
   it("preserva achievements que revelam nível de construção", () => {
     expect(profile.achievements.find((a) => a.name === "Empire Builder")?.value).toBe(9);
+  });
+
+  it("aceita o escopo clanCapital e degrada escopo desconhecido para 'other'", () => {
+    const byName = (n: string) => profile.achievements.find((a) => a.name === n);
+    expect(byName("Aggressive Capitalism")?.scope).toBe("clanCapital");
+    expect(byName("Escopo Novo")?.scope).toBe("other");
+    expect(byName("Empire Builder")?.scope).toBe("home");
   });
 });
 

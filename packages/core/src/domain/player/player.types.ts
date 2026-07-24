@@ -1,4 +1,4 @@
-import type { UnitCategory, UnitState, Village } from "@clashpilot/coc-data";
+import type { AchievementScope, UnitCategory, UnitState, Village } from "@clashpilot/coc-data";
 import type { PlayerTag } from "./player-tag.js";
 
 /**
@@ -20,7 +20,7 @@ export interface PlayerAchievement {
   readonly stars: number;
   readonly value: number;
   readonly target: number;
-  readonly village: Village;
+  readonly scope: AchievementScope;
 }
 
 export interface PlayerLeague {

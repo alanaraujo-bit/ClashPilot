@@ -5,7 +5,21 @@
  * A API oficial NÃO fornece nada disso — ver docs/00-visao-e-escopo.md §2.3 e ADR-004.
  */
 
+/** Vilas que possuem unidades com nível. Só estas entram em cálculo de progresso. */
 export type Village = "home" | "builderBase";
+
+/**
+ * Escopo de um achievement. A API devolve também `clanCapital` — valor que não aparece em
+ * nenhuma documentação e que descobrimos no primeiro payload real. `other` existe para que
+ * um escopo novo num update futuro não derrube o parsing do jogador inteiro.
+ */
+export type AchievementScope = Village | "clanCapital" | "other";
+
+const KNOWN_SCOPES: readonly string[] = ["home", "builderBase", "clanCapital"];
+
+export function toAchievementScope(value: string): AchievementScope {
+  return KNOWN_SCOPES.includes(value) ? (value as AchievementScope) : "other";
+}
 
 export type Resource = "gold" | "elixir" | "darkElixir" | "gems";
 

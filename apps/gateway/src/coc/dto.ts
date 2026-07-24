@@ -43,7 +43,10 @@ export const achievementDto = z.object({
   target: z.number(),
   info: z.string().optional(),
   completionInfo: z.string().nullable().optional(),
-  village: z.enum(["home", "builderBase"]),
+  // Deliberadamente `string`, não enum: a API devolve `clanCapital` (não documentado) e pode
+  // inventar outro escopo num update. Achievement é dado auxiliar — um valor novo não pode
+  // derrubar o parsing do jogador inteiro. A normalização acontece no mapper.
+  village: z.string(),
 });
 
 export const playerDto = z.object({

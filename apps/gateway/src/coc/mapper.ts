@@ -1,4 +1,4 @@
-import { classifyTroop, toKey } from "@clashpilot/coc-data";
+import { classifyTroop, toAchievementScope, toKey } from "@clashpilot/coc-data";
 import {
   type PlayerAchievement,
   type PlayerProfile,
@@ -82,7 +82,7 @@ export function mapPlayer(dto: PlayerDto): PlayerProfile {
     stars: a.stars,
     value: a.value,
     target: a.target,
-    village: a.village,
+    scope: toAchievementScope(a.village),
   }));
 
   return {
