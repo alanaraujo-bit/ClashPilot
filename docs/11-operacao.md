@@ -18,26 +18,38 @@ Estado em 24/07/2026, fim da Fase 0.
 - **Vercel:** Root Directory = `apps/web`, framework Next.js, região `gru1` (São Paulo).
 - **Healthchecks:** `GET /health` e `GET /health/egress-ip` no gateway.
 
-## 2. ⚠️ O IP de saída do gateway ainda não é garantidamente fixo
+## 2. O IP de saída do Railway **não** é fixo — medido, não suposto
 
-IP observado hoje: **`136.107.98.164`**.
+Duas coisas diferentes, e só uma importa para a Supercell:
 
-Esse é o endereço que precisa entrar na allowlist da chave da API do Clash of Clans. **Porém**,
-por padrão o Railway não garante IP de saída estável entre redeploys — isso é um recurso
-(_Static Outbound IPs_) que depende do plano. Se o IP mudar, toda chamada à API passa a
-devolver `403 accessDenied.invalidIp`.
+|                                          | O que é                                                 | Serve para a allowlist? |
+| ---------------------------------------- | ------------------------------------------------------- | ----------------------- |
+| `gateway-production-c67a.up.railway.app` | **entrada** — por onde o mundo chega no gateway         | ❌ não                  |
+| IP de `GET /health/egress-ip`            | **saída** — origem de quem chama `api.clashofclans.com` | ✅ é este               |
 
-Antes de gerar a chave definitiva, fazer **um** destes:
+Medição de 24/07/2026: o IP de saída era `136.107.98.164` e passou a `34.48.151.155` **sem
+redeploy nosso**. Dentro de um mesmo container ele é estável; entre containers, não.
+O painel de Networking do serviço não oferece _Static Outbound IP_ — só _Outbound IPv6_.
 
-1. Habilitar _Static Outbound IP_ no serviço `gateway` (painel do Railway → Settings → Networking)
-   e usar o IP que ele fixar; **ou**
-2. Cadastrar na chave o IP do proxy comunitário `cocproxy.royaleapi.dev` (`45.79.218.79`)
-   e deixar todo o tráfego sair por ele — já está configurado em `COC_FALLBACK_PROXY_URL`; **ou**
-3. Aceitar o risco e monitorar: o gateway já detecta `invalidIp` e faz failover para o proxy
-   automaticamente (ver `apps/gateway/src/coc/client.ts`), então o app não cai — mas o caminho
-   principal fica degradado até o IP ser recadastrado.
+**Decisão: o gateway sai pelo proxy de IP fixo da RoyaleAPI.**
 
-O endpoint `GET /health/egress-ip` existe exatamente para verificar isso a qualquer momento.
+```
+COC_API_BASE_URL       = https://cocproxy.royaleapi.dev/v1   (primário, IP fixo 45.79.218.79)
+COC_FALLBACK_PROXY_URL = https://api.clashofclans.com/v1     (secundário, direto)
+```
+
+O proxy espelha a API 1:1 — mesmo path, mesmo header `Authorization`, mesma resposta. A chave
+continua sendo **nossa**; ele só encaminha. O caminho direto fica como secundário e passa a
+funcionar sozinho no dia em que houver um IP realmente estático para cadastrar (a chave aceita
+até 5 CIDRs, então dá para ter os dois ao mesmo tempo).
+
+Custos dessa escolha, explícitos:
+
+- dependência de um terceiro sem SLA — mitigada pelo failover automático já implementado;
+- **o Bearer token trafega pelo proxy** ⇒ usar uma chave **dedicada e revogável** para isso,
+  nunca compartilhada com outra aplicação;
+- o IP do proxy já mudou uma vez no passado (`128.128.128.128` → `45.79.218.79`), então
+  `GET /health/egress-ip` e o alerta de `invalidIp` continuam sendo o instrumento de vigilância.
 
 ## 3. Variáveis configuradas
 
@@ -49,7 +61,8 @@ O endpoint `GET /health/egress-ip` existe exatamente para verificar isso a qualq
 | `NODE_ENV`                    | `production`                                                                   |
 | `GATEWAY_SECRET`              | segredo HMAC de 48 caracteres, igual ao da Vercel                              |
 | `COC_API_TOKEN`               | ⚠️ `pendente-aguardando-ip-fixo` — **trocar pela chave real**                  |
-| `COC_FALLBACK_PROXY_URL`      | `https://cocproxy.royaleapi.dev/v1`                                            |
+| `COC_API_BASE_URL`            | `https://cocproxy.royaleapi.dev/v1` (proxy de IP fixo — primário)              |
+| `COC_FALLBACK_PROXY_URL`      | `https://api.clashofclans.com/v1` (direto — secundário)                        |
 | `COC_RATE_LIMIT_RPS`          | `10`                                                                           |
 | `DATABASE_URL` / `DIRECT_URL` | referências ao serviço `Postgres`                                              |
 
@@ -57,9 +70,9 @@ O endpoint `GET /health/egress-ip` existe exatamente para verificar isso a qualq
 
 ## 4. Próximo passo bloqueante: a chave da API
 
-1. Resolver o item 2 acima (IP fixo ou proxy).
-2. Entrar em https://developer.clashofclans.com → _My Account_ → **Create New Key**.
-3. Colar o IP escolhido na allowlist (a chave aceita até 5 CIDRs).
+1. Entrar em https://developer.clashofclans.com → _My Account_ → **Create New Key**.
+2. Nome sugerido: `clashpilot-gateway` (chave dedicada — ver §2).
+3. Na allowlist de IP, colar exatamente: **`45.79.218.79`**
 4. `railway variables --service gateway --set "COC_API_TOKEN=<chave>"`.
 5. Validar: uma tag real deve voltar o perfil normalizado pelo gateway.
 
