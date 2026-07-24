@@ -35,12 +35,21 @@ importers:
       '@clashpilot/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@prisma/adapter-pg':
+        specifier: ^6.19.3
+        version: 6.19.3
+      '@prisma/client':
+        specifier: ^6.19.3
+        version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
       fastify:
         specifier: ^5.2.0
         version: 5.10.0
       node-cron:
         specifier: ^3.0.3
         version: 3.0.3
+      pg:
+        specifier: ^8.13.1
+        version: 8.22.0
       zod:
         specifier: ^4.4.3
         version: 4.4.3

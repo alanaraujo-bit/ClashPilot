@@ -17,7 +17,10 @@
     "@clashpilot/contracts": "workspace:*",
     "@clashpilot/core": "workspace:*",
     "@clashpilot/db": "workspace:*",
+    "@prisma/adapter-pg": "^6.19.3",
+    "@prisma/client": "^6.19.3",
     "node-cron": "^3.0.3",
+    "pg": "^8.13.1",
     "fastify": "^5.2.0",
     "zod": "^4.4.3"
   },
