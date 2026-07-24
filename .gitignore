@@ -24,3 +24,7 @@ pnpm-debug.log*
 
 playwright-report/
 test-results/
+
+.vercel
+.env*
+!.env.example
