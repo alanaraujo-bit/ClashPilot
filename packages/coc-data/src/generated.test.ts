@@ -69,6 +69,28 @@ describe("valores travados contra o jogo", () => {
     expect(levelOf("siege-machine-ram", 1).minTownHall).toBe(12); // SiegeWorkshop (TH12)
   });
 
+  it("entradas não-treináveis (habilidades de Super Tropa, protótipos, clones) ficam fora do exército", () => {
+    // `DisableProduction=true` no arquivo do jogo. Sem o filtro, o `InvisibilityST` metia
+    // 8.000.000 de elixir no denominador de um TH6 e afundava o progresso do exército.
+    for (const key of [
+      "invisibilityst",
+      "ragest",
+      "poisonst",
+      "miner-def",
+      "prototype3",
+      "spellbat",
+      "protospell2",
+      "slow",
+      "boostdefences",
+    ]) {
+      expect(findEntry(CATALOG, key), key).toBeUndefined();
+    }
+    // As de verdade continuam presentes.
+    for (const key of ["barbarian", "golem", "lighningstorm", "healingwave"]) {
+      expect(findEntry(CATALOG, key), key).toBeDefined();
+    }
+  });
+
   it("nenhum custo em elixir negro aparece antes do TH7 (Quartel de Elixir Negro)", () => {
     for (const item of CATALOG) {
       for (const level of item.levels) {

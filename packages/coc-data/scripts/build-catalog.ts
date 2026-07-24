@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { type CsvObject, type CsvRow, asInt, asString, parseSupercellCsv } from "./csv.js";
+import { type CsvObject, type CsvRow, asBool, asInt, asString, parseSupercellCsv } from "./csv.js";
 import { loadAsset } from "./fetch-assets.js";
 import { GAME_FINGERPRINT } from "./fingerprint.js";
 
@@ -253,6 +253,12 @@ function fromLabUpgrades(
     const first = object.levels[0];
     if (!first || !isHomeVillage(first)) continue;
     if (asString(first["EnabledByCalendar"])) continue; // Super Tropa / evento: não é progresso
+    // `DisableProduction` é a flag do próprio jogo para o que o jogador NÃO treina: habilidades de
+    // Super Tropa (`InvisibilityST`, `RageST`…), spells de torre, protótipos e clones defensivos
+    // (`Miner_DEF`). Sem isto o denominador do exército inchava — o `InvisibilityST` sozinho metia
+    // 8.000.000 de elixir "faltando" num TH6. `EnabledByCalendar` não pega esses; foi o que a
+    // segunda passada da validação (mesma vila TH6) revelou.
+    if (asBool(first["DisableProduction"])) continue;
 
     // Piso de destravamento: a unidade só existe a partir do TH em que o prédio produtor a
     // libera. Nenhum nível dela pode ser mais barato/mais cedo do que isso.

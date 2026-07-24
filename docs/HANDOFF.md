@@ -12,21 +12,32 @@ Idioma do produto e dos commits: **português (pt-BR)**.
 ## 1. TL;DR — onde paramos
 
 Fases **0 a 7 e 6 entregues e no ar** (a ordem de execução não seguiu a numeração do roadmap).
-Tudo commitado e deployado. **101 testes passando**, typecheck strict sem `any`, build verde.
+Tudo commitado e deployado. **102 testes passando**, typecheck strict sem `any`, build verde.
 
-**Primeira validação contra vila real feita (2026-07-24) — e valeu ouro.** A vila `#GR0VR9VGP`
-(`PHANT0MX`, TH6) é do próprio Alan (não é de teste; NÃO apagar). Rodar o `sanity` nela
-escancarou um **bug de gating no catálogo**: tropas e feitiços de elixir negro (Golem, Bowler,
-Bruxa, Feitiço de Veneno…) apareciam liberados já em ~TH3, porque o gerador gateava só pelo
-nível de Laboratório e ignorava o prédio que PRODUZ a unidade. Um TH6 aparecia "precisando" de
-860k de elixir negro sem ter Quartel de Elixir Negro. **Corrigido** (ver §6): agora o gate usa
-`max(TH do Laboratório, TH do prédio produtor)` via `ProductionBuilding`+`BarrackLevel`/
-`SpellForgeLevel`. Efeito no TH6 real: progresso do exército 1,3% → 10,2%, denominador
-129,7M → 16,6M, upgrades 111 → 33, caminho crítico 157d → 15d, zero elixir negro.
+**Primeira validação contra vila real feita (2026-07-24) — e valeu ouro: achou DOIS bugs de
+catálogo.** A vila `#GR0VR9VGP` (`PHANT0MX`, TH6) é do próprio Alan (não é de teste; NÃO apagar).
+Rodar o `sanity` nela, item a item, escancarou:
 
-**Pendência que ainda atravessa tudo:** falta o Alan conferir os números finos olhando o jogo
-ao lado (os ~33 upgrades / próxima jogada Goblin 4) e validar THs mais altos com heróis/ledger.
-Cobertura da vila segue em 27,7% porque o Village Ledger de `/vila` está vazio para essa conta.
+1. **Gating pelo prédio produtor** — tropas/feitiços de elixir negro (Golem, Bowler, Veneno…)
+   apareciam liberados já em ~TH3 porque o gerador gateava só pelo nível de Laboratório e ignorava
+   o prédio que PRODUZ a unidade. Fix: `minTownHall = max(TH do Lab, TH do prédio produtor)` via
+   `ProductionBuilding`+`BarrackLevel`/`SpellForgeLevel`.
+2. **Entradas-fantasma** — 11 itens não-treináveis (habilidades de Super Tropa `InvisibilityST`/
+   `RageST`/`PoisonST`, protótipos, clone defensivo `Miner_DEF`) inflavam o denominador do exército.
+   O `InvisibilityST` sozinho metia 8M de elixir "faltando" num TH6. Fix: filtrar `DisableProduction`.
+
+Efeito acumulado no TH6 real: progresso do exército **1,3% → 25,6%**, denominador 129,7M → **6,62M**,
+upgrades no CV **111 → 17**, caminho crítico 157d → **~5d**, zero elixir negro. Ambos travados por
+âncoras em `src/generated.test.ts`.
+
+**Aprendizado de produto:** o Alan marcou as CONSTRUÇÕES no máximo em `/vila` (Village Ledger) e
+estranhou o dashboard mostrar 75% em vez de 100%. Está correto: "VILA MÁXIMA" = maximizar TUDO no
+CV atual, e o **exército** vem da API do jogo (não do ledger) — as tropas dele estão um nível abaixo
+do máximo do CV6 e os feitiços zerados (~25%). Vale considerar mostrar o breakdown por categoria no
+dashboard para deixar óbvio "o que está te segurando é o Laboratório".
+
+**Pendência que ainda atravessa tudo:** validar THs mais altos (com heróis e ledger cheio); a
+cobertura segue 27,7% quando o ledger está vazio.
 
 ### Como fazer a validação (a tarefa pendente)
 
@@ -158,6 +169,11 @@ Pipeline em `packages/coc-data/scripts/` (baixa, decodifica LZMA, faz cache, tra
   gateava só pelo Laboratório e vazava tropa/feitiço de elixir negro para ~TH3 (achado na 1ª
   validação real, TH6). Travado por âncoras em `src/generated.test.ts` (Golem=TH8, Bowler=TH10,
   Poison=TH8, e "nenhum custo de elixir negro antes do TH7").
+- Filtro de treináveis: só entram tropas/feitiços com `DisableProduction=false`. Essa flag do jogo
+  exclui habilidades de Super Tropa (`InvisibilityST`…), spells de torre, protótipos e o clone
+  defensivo `Miner_DEF`, que antes inflavam o denominador do exército. `EnabledByCalendar` (Super
+  Tropa por evento) já era filtrado; `DisableProduction` foi somado em 2026-07-24. Army caiu de 65
+  para 54 itens; âncora trava a exclusão.
 - **Limite conhecido:** entre TH14–TH16 o denominador de pets é otimista (o mapa pet→nível da
   Casa de Pets não existe nos arquivos). Erro na categoria de menor peso (0,07), nulo abaixo de TH14.
 
