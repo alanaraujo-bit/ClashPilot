@@ -21,7 +21,8 @@ model User {
   id            String      @id @default(cuid())
   email         String      @unique
   emailVerified Boolean     @default(false)
-  name          String?
+  // Better Auth exige `name` não-nulo; vazio é aceitável até o usuário preencher o perfil.
+  name          String      @default("")
   image         String?
   locale        String      @default("pt-BR")
   timezone      String      @default("America/Sao_Paulo")

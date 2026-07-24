@@ -14,7 +14,10 @@
   },
   "dependencies": {
     "@clashpilot/coc-data": "workspace:*",
+    "@clashpilot/contracts": "workspace:*",
     "@clashpilot/core": "workspace:*",
+    "@clashpilot/db": "workspace:*",
+    "better-auth": "^1.2.7",
     "@tanstack/react-query": "^5.62.11",
     "clsx": "^2.1.1",
     "framer-motion": "^11.15.0",
@@ -22,7 +25,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.6.0",
-    "zod": "^3.24.1"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@clashpilot/config": "workspace:*",
