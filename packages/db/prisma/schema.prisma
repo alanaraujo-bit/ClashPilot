@@ -5,15 +5,22 @@
 // separado do verificado (`source` + `confidence`), e nenhum Json onde exista query.
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/client"
+  // `prisma-client` (sem o sufixo `-js`) é o generator novo: emite TypeScript e é o ÚNICO
+  // que honra `queryCompiler`. Com o antigo `prisma-client-js` a flag é silenciosamente
+  // ignorada e o engine nativo continua sendo baixado.
+  provider     = "prisma-client"
+  output       = "../generated/client"
+  runtime      = "nodejs"
+  moduleFormat = "esm"
 
-  // `queryCompiler` + `driverAdapters` geram um client 100% JavaScript, SEM o engine nativo
-  // em Rust. Isso elimina de vez a classe de erro que nos custou três deploys: o
-  // `libquery_engine-*.so.node` não é um import, então nenhum bundler o enxerga e o file
+  // `engineType = "client"` gera um client 100% JavaScript, SEM o engine nativo em Rust —
+  // as queries são compiladas em JS e executadas pelo driver `pg`.
+  //
+  // Isto elimina de vez a classe de erro que custou três deploys: o
+  // `libquery_engine-*.so.node` não é um `import`, então nenhum bundler o enxerga e o file
   // tracing da Vercel não o copia para a função. Sem binário, não há o que copiar.
-  // Bônus: cold start menor e o mesmo client funciona em qualquer runtime.
-  previewFeatures = ["queryCompiler", "driverAdapters", "relationJoins"]
+  // Bônus: cold start menor.
+  engineType   = "client"
 }
 
 datasource db {

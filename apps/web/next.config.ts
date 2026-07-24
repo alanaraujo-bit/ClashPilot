@@ -10,22 +10,19 @@ const config: NextConfig = {
   poweredByHeader: false,
 
   /**
-   * Prisma em monorepo pnpm na Vercel.
-   *
-   * O engine nativo (`libquery_engine-*.so.node`) não é um import: o webpack não o vê e o
-   * file tracing padrão, ancorado em `apps/web`, não olha para fora da pasta. Resultado:
-   * função sobe sem o engine e todo acesso ao banco vira PrismaClientInitializationError.
-   *
-   * `outputFileTracingRoot` move a âncora para a raiz do monorepo e `outputFileTracingIncludes`
-   * copia o client gerado junto com a função.
+   * A âncora do file tracing precisa ser a raiz do monorepo: sem isso, o Next não copia
+   * nada de fora de `apps/web` para a função serverless.
    */
   outputFileTracingRoot: repoRoot,
-  outputFileTracingIncludes: {
-    "/**": ["../../packages/db/generated/client/**"],
-  },
-  serverExternalPackages: ["@prisma/client", "@clashpilot/db"],
   // Pacotes do monorepo são TypeScript cru: o Next os transpila junto com a app.
-  transpilePackages: ["@clashpilot/core", "@clashpilot/coc-data", "@clashpilot/contracts"],
+  // `@clashpilot/db` entra aqui porque o client do Prisma agora é TypeScript gerado
+  // (generator `prisma-client`) — precisa ser transpilado, não tratado como pacote externo.
+  transpilePackages: [
+    "@clashpilot/core",
+    "@clashpilot/coc-data",
+    "@clashpilot/contracts",
+    "@clashpilot/db",
+  ],
   experimental: {
     optimizePackageImports: ["framer-motion", "@tanstack/react-query"],
   },

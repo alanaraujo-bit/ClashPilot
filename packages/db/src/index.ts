@@ -1,7 +1,7 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/client/index.js";
+import { PrismaClient } from "../generated/client/client.js";
 
-export * from "../generated/client/index.js";
+export * from "../generated/client/client.js";
 
 /**
  * Client sem engine nativo (ver `schema.prisma`): a conexão vai pelo driver `pg` através de
