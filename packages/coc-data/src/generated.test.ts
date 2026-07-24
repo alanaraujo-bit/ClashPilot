@@ -4,6 +4,7 @@ import {
   MAX_TOWN_HALL,
   TOWN_HALLS,
   catalogKeyForApiName,
+  displayNameForKey,
   findEntry,
   maxLevelForTownHall,
 } from "./index.js";
@@ -116,6 +117,16 @@ describe("valores travados contra o jogo", () => {
         }
       }
     }
+  });
+
+  it("unidades do núcleo têm nome de exibição em pt-BR oficial", () => {
+    expect(displayNameForKey("barbarian")).toBe("Bárbaro");
+    expect(displayNameForKey("warlock")).toBe("Bruxa"); // Witch
+    expect(displayNameForKey("warrior-girl")).toBe("Valquíria");
+    expect(displayNameForKey("lighningstorm")).toBe("Feitiço de Relâmpago");
+    expect(displayNameForKey("barbarian-king")).toBe("Rei Bárbaro");
+    // Sem tradução curada ainda: cai no nome público EN (nunca fica com o nome interno cru).
+    expect(displayNameForKey("giant-gauntlet")).toBe("Giant Gauntlet");
   });
 
   it("o nome público da API casa com a chave interna do catálogo", () => {

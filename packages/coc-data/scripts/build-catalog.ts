@@ -3,6 +3,7 @@ import path from "node:path";
 import { type CsvObject, type CsvRow, asBool, asInt, asString, parseSupercellCsv } from "./csv.js";
 import { loadAsset } from "./fetch-assets.js";
 import { GAME_FINGERPRINT } from "./fingerprint.js";
+import { PT_NAMES } from "./pt-names.js";
 
 /**
  * Gera `src/generated/catalog.ts` a partir dos arquivos de lógica oficiais do jogo.
@@ -595,7 +596,8 @@ for (const entry of catalog) {
   const en = enByInternalName.get(entry.name);
   if (!en) continue;
   entry.name = en;
-  entry.ptName = en; // pt-BR pendente: o CDN só expõe EN; tradução curada fica para um passo à parte
+  // Nome pt-BR oficial do jogo quando temos (scripts/pt-names.ts); senão, cai no EN público.
+  entry.ptName = PT_NAMES[entry.key] ?? en;
   const apiKey = toKey(en);
   if (apiKey !== entry.key) apiAliases[apiKey] = entry.key;
 }

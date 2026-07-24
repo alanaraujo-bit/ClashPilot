@@ -33,6 +33,11 @@ export function catalogKeyForApiName(name: string): string {
   return GENERATED_API_ALIASES[key] ?? key;
 }
 
+/** Nome de exibição (pt-BR oficial quando temos) de uma unidade pela chave do catálogo. */
+export function displayNameForKey(key: string): string | undefined {
+  return GENERATED_CATALOG.find((e) => e.key === key)?.ptName;
+}
+
 /** Nível máximo do item liberado num dado Centro de Vila. 0 = não desbloqueado ainda. */
 export function maxLevelForTownHall(entry: CatalogEntry, th: TownHallLevel): number {
   let max = 0;

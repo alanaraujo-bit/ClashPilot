@@ -1,4 +1,9 @@
-import { catalogKeyForApiName, classifyTroop, toAchievementScope } from "@clashpilot/coc-data";
+import {
+  catalogKeyForApiName,
+  classifyTroop,
+  displayNameForKey,
+  toAchievementScope,
+} from "@clashpilot/coc-data";
 import {
   type PlayerAchievement,
   type PlayerProfile,
@@ -27,9 +32,11 @@ interface UnitLike {
 }
 
 function toUnit(dto: UnitLike, category: PlayerUnit["category"]): PlayerUnit {
+  const key = catalogKeyForApiName(dto.name);
   return {
-    key: catalogKeyForApiName(dto.name),
-    name: dto.name,
+    key,
+    // Nome de exibição em pt-BR quando temos; senão, o nome público da API (EN).
+    name: displayNameForKey(key) ?? dto.name,
     level: dto.level,
     category,
     village: dto.village,
@@ -65,7 +72,15 @@ export function mapPlayer(dto: PlayerDto): PlayerProfile {
     const key = catalogKeyForApiName(name);
     if (seenEquipment.has(key)) return;
     seenEquipment.add(key);
-    units.push({ key, name, level, category: "equipment", village, globalMaxLevel: maxLevel });
+    const display = displayNameForKey(key) ?? name;
+    units.push({
+      key,
+      name: display,
+      level,
+      category: "equipment",
+      village,
+      globalMaxLevel: maxLevel,
+    });
   };
 
   for (const hero of dto.heroes) {

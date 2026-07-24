@@ -151,7 +151,8 @@ export function rankUpgrades(input: PriorityInput): UpgradeCandidate[] {
 
     candidates.push({
       key: entry.key,
-      name: entry.name,
+      // `ptName` é o nome de exibição (pt-BR oficial quando temos, senão o EN público).
+      name: entry.ptName,
       category: entry.scoreCategory,
       track: trackOf(entry),
       fromLevel: lowest,

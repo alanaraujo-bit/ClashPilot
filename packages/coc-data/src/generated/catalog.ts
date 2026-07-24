@@ -2,12 +2,12 @@
 // Fonte: arquivos de lógica oficiais do Clash of Clans.
 // Regenerar: pnpm --filter @clashpilot/coc-data build:catalog
 // Fingerprint dos assets: c1dd37dcad3d77e0678a1ce2319225ede9a6b821
-// Gerado em: 2026-07-24T23:04:37.466Z
+// Gerado em: 2026-07-24T23:36:21.228Z
 
 import type { CatalogEntry, TownHallSpec } from "../types.js";
 
 export const GENERATED_FINGERPRINT = "c1dd37dcad3d77e0678a1ce2319225ede9a6b821";
-export const GENERATED_AT = "2026-07-24T23:04:37.467Z";
+export const GENERATED_AT = "2026-07-24T23:36:21.229Z";
 
 export const GENERATED_TOWN_HALLS: readonly TownHallSpec[] = [
   {
@@ -938,7 +938,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "apprentice-warden",
     name: "Apprentice Warden",
-    ptName: "Apprentice Warden",
+    ptName: "Guardião Aprendiz",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -1184,7 +1184,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "archer",
     name: "Archer",
-    ptName: "Archer",
+    ptName: "Arqueira",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -1430,7 +1430,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "archer-queen",
     name: "Archer Queen",
-    ptName: "Archer Queen",
+    ptName: "Rainha Arqueira",
     category: "hero",
     scoreCategory: "hero",
     village: "home",
@@ -2310,7 +2310,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "babydragon",
     name: "Baby Dragon",
-    ptName: "Baby Dragon",
+    ptName: "Bebê Dragão",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -2405,7 +2405,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "balloon",
     name: "Balloon",
-    ptName: "Balloon",
+    ptName: "Balão",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -2507,7 +2507,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "barbarian",
     name: "Barbarian",
-    ptName: "Barbarian",
+    ptName: "Bárbaro",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -2746,7 +2746,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "barbarian-king",
     name: "Barbarian King",
-    ptName: "Barbarian King",
+    ptName: "Rei Bárbaro",
     category: "hero",
     scoreCategory: "hero",
     village: "home",
@@ -3713,7 +3713,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "battle-drill",
     name: "Battle Drill",
-    ptName: "Battle Drill",
+    ptName: "Escavadeira Bélica",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -3766,7 +3766,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "boar-rider",
     name: "Hog Rider",
-    ptName: "Hog Rider",
+    ptName: "Corredor",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -4081,7 +4081,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "bowler",
     name: "Bowler",
-    ptName: "Bowler",
+    ptName: "Lançador",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -4183,7 +4183,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "bulldozer",
     name: "Mighty Yak",
-    ptName: "Mighty Yak",
+    ptName: "Poderoso Iaque",
     category: "pet",
     scoreCategory: "pet",
     village: "home",
@@ -4984,7 +4984,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "dragon",
     name: "Dragon",
-    ptName: "Dragon",
+    ptName: "Dragão",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -5086,7 +5086,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "dragon-rider",
     name: "Dragon Rider",
-    ptName: "Dragon Rider",
+    ptName: "Dragão Dirigível",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -5139,7 +5139,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "druid-healer",
     name: "Druid",
-    ptName: "Druid",
+    ptName: "Druida",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -5192,7 +5192,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "duplicate",
     name: "Clone Spell",
-    ptName: "Clone Spell",
+    ptName: "Feitiço de Clone",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -5266,7 +5266,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "earthquake",
     name: "Earthquake Spell",
-    ptName: "Earthquake Spell",
+    ptName: "Feitiço de Terremoto",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -5709,7 +5709,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "electro-dragon",
     name: "Electro Dragon",
-    ptName: "Electro Dragon",
+    ptName: "Dragão Elétrico",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -5783,7 +5783,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "electro-titan",
     name: "Electro Titan",
-    ptName: "Electro Titan",
+    ptName: "Titã Elétrica",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -5829,7 +5829,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "electrowl",
     name: "Electro Owl",
-    ptName: "Electro Owl",
+    ptName: "Coruja Elétrica",
     category: "pet",
     scoreCategory: "pet",
     village: "home",
@@ -6785,7 +6785,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "freeze",
     name: "Freeze Spell",
-    ptName: "Freeze Spell",
+    ptName: "Feitiço de Gelo",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -7207,7 +7207,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "furnace",
     name: "Furnace",
-    ptName: "Furnace",
+    ptName: "Fornalha",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -7253,7 +7253,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "gargoyle",
     name: "Minion",
-    ptName: "Minion",
+    ptName: "Servo",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -7380,7 +7380,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "giant",
     name: "Giant",
-    ptName: "Giant",
+    ptName: "Gigante",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -8196,7 +8196,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "grand-warden",
     name: "Grand Warden",
-    ptName: "Grand Warden",
+    ptName: "Grande Guardião",
     category: "hero",
     scoreCategory: "hero",
     village: "home",
@@ -8995,7 +8995,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "haste",
     name: "Rage Spell",
-    ptName: "Rage Spell",
+    ptName: "Feitiço de Fúria",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -9192,7 +9192,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "headhunter",
     name: "Headhunter",
-    ptName: "Headhunter",
+    ptName: "Caçadora de Heróis",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -9231,7 +9231,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "healer",
     name: "Healer",
-    ptName: "Healer",
+    ptName: "Curadora",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -9593,7 +9593,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "healingwave",
     name: "Healing Spell",
-    ptName: "Healing Spell",
+    ptName: "Feitiço de Cura",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -10116,7 +10116,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "ice-golem",
     name: "Ice Golem",
-    ptName: "Ice Golem",
+    ptName: "Golem de Gelo",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -10250,7 +10250,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "invisibility",
     name: "Invisibility Spell",
-    ptName: "Invisibility Spell",
+    ptName: "Feitiço de Invisibilidade",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -10433,7 +10433,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "jump",
     name: "Jump Spell",
-    ptName: "Jump Spell",
+    ptName: "Feitiço de Salto",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -10742,7 +10742,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "lighningstorm",
     name: "Lightning Spell",
-    ptName: "Lightning Spell",
+    ptName: "Feitiço de Relâmpago",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -11323,7 +11323,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "miner",
     name: "Miner",
-    ptName: "Miner",
+    ptName: "Mineiro",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -11481,7 +11481,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "minion-hero",
     name: "Minion Prince",
-    ptName: "Minion Prince",
+    ptName: "Príncipe Servo",
     category: "hero",
     scoreCategory: "hero",
     village: "home",
@@ -13048,7 +13048,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "overgrowth",
     name: "Overgrowth Spell",
-    ptName: "Overgrowth Spell",
+    ptName: "Feitiço de Raízes",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -13586,7 +13586,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "poison",
     name: "Poison Spell",
-    ptName: "Poison Spell",
+    ptName: "Feitiço de Veneno",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -14099,7 +14099,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "recall",
     name: "Recall Spell",
-    ptName: "Recall Spell",
+    ptName: "Feitiço de Retorno",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -14159,7 +14159,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "revive",
     name: "Revive Spell",
-    ptName: "Revive Spell",
+    ptName: "Feitiço de Reanimação",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -14405,7 +14405,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "root-rider",
     name: "Root Rider",
-    ptName: "Root Rider",
+    ptName: "Poderosa Hera",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -14852,7 +14852,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "siege-bowler-balloon",
     name: "Stone Slammer",
-    ptName: "Stone Slammer",
+    ptName: "Quebradora de Pedras",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -14958,7 +14958,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "siege-log-launcher",
     name: "Log Launcher",
-    ptName: "Log Launcher",
+    ptName: "Lançador de Troncos",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -15011,7 +15011,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "siege-machine-carrier",
     name: "Siege Barracks",
-    ptName: "Siege Barracks",
+    ptName: "Quartel de Cerco",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -15064,7 +15064,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "siege-machine-flyer",
     name: "Battle Blimp",
-    ptName: "Battle Blimp",
+    ptName: "Dirigível Bélico",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -15117,7 +15117,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "siege-machine-ram",
     name: "Wall Wrecker",
-    ptName: "Wall Wrecker",
+    ptName: "Quebra-muros",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -15535,7 +15535,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "spawnbats",
     name: "Bat Spell",
-    ptName: "Bat Spell",
+    ptName: "Feitiço Morcego",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -15602,7 +15602,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "spawnskele",
     name: "Skeleton Spell",
-    ptName: "Skeleton Spell",
+    ptName: "Feitiço de Esqueleto",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -15676,7 +15676,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "speedup",
     name: "Haste Spell",
-    ptName: "Haste Spell",
+    ptName: "Feitiço de Aceleração",
     category: "spell",
     scoreCategory: "army",
     village: "home",
@@ -16535,7 +16535,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "unipony",
     name: "Unicorn",
-    ptName: "Unicorn",
+    ptName: "Unicórnio",
     category: "pet",
     scoreCategory: "pet",
     village: "home",
@@ -16964,7 +16964,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "wall-breaker",
     name: "Wall Breaker",
-    ptName: "Wall Breaker",
+    ptName: "Destruidor de Muros",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -17073,7 +17073,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "warlock",
     name: "Witch",
-    ptName: "Witch",
+    ptName: "Bruxa",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -17140,7 +17140,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "warrior-girl",
     name: "Valkyrie",
-    ptName: "Valkyrie",
+    ptName: "Valquíria",
     category: "troop",
     scoreCategory: "army",
     village: "home",
@@ -17235,7 +17235,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "warrior-princess",
     name: "Royal Champion",
-    ptName: "Royal Champion",
+    ptName: "Campeã Real",
     category: "hero",
     scoreCategory: "hero",
     village: "home",
@@ -17596,7 +17596,7 @@ export const GENERATED_CATALOG: readonly CatalogEntry[] = [
   {
     key: "wizard",
     name: "Wizard",
-    ptName: "Wizard",
+    ptName: "Mago",
     category: "troop",
     scoreCategory: "army",
     village: "home",
