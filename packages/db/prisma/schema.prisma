@@ -7,6 +7,12 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["relationJoins"]
+  // Gerar DENTRO do pacote, não no node_modules/.pnpm: com pnpm isolado, o file tracing do
+  // Next não segue o link simbólico e a função serverless sobe sem o engine
+  // (`PrismaClientInitializationError` em produção, tudo verde no local).
+  output          = "../generated/client"
+  // `native` para o dev em Windows; `rhel-openssl-3.0.x` é o runtime da Vercel.
+  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {

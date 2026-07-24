@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../generated/client/index.js";
 
-export * from "@prisma/client";
+export * from "../generated/client/index.js";
 
 /**
  * Instância única. Em dev o HMR do Next recria módulos a cada save; sem o cache global
