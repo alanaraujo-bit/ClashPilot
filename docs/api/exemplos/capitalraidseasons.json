@@ -1,0 +1,231 @@
+{
+  "items": [
+    {
+      "state": "ended",
+      "startTime": "20251114T070000.000Z",
+      "endTime": "20251117T070000.000Z",
+      "capitalTotalLoot": 45970,
+      "raidsCompleted": 3,
+      "totalAttacks": 12,
+      "enemyDistrictsDestroyed": 4,
+      "offensiveReward": 145,
+      "defensiveReward": 224,
+      "members": [
+        {
+          "tag": "#280GCCGYV",
+          "name": "ItzSmokes",
+          "attacks": 6,
+          "attackLimit": 5,
+          "bonusAttackLimit": 1,
+          "capitalResourcesLooted": 22274
+        },
+        {
+          "tag": "#GULRUVQG9",
+          "name": "U.S.A Mini Coop",
+          "attacks": 6,
+          "attackLimit": 5,
+          "bonusAttackLimit": 1,
+          "capitalResourcesLooted": 23696
+        }
+      ],
+      "attackLog": [
+        {
+          "defender": {
+            "tag": "#2L9GP2992",
+            "name": "~BAGWIS~",
+            "level": 24,
+            "badgeUrls": {
+              "small": "https://api-assets.clashofclans.com/badges/70/a_AMlHKrUkzNGRhZPtdhstKW3sfO0KqzaVRQ_iZDKSk.png",
+              "large": "https://api-assets.clashofclans.com/badges/512/a_AMlHKrUkzNGRhZPtdhstKW3sfO0KqzaVRQ_iZDKSk.png",
+              "medium": "https://api-assets.clashofclans.com/badges/200/a_AMlHKrUkzNGRhZPtdhstKW3sfO0KqzaVRQ_iZDKSk.png"
+            }
+          },
+          "attackCount": 12,
+          "districtCount": 9,
+          "districtsDestroyed": 4,
+          "districts": [
+            {
+              "id": 70000000,
+              "name": "Capital Peak",
+              "districtHallLevel": 10,
+              "destructionPercent": 0,
+              "stars": 0,
+              "attackCount": 0,
+              "totalLooted": 0
+            },
+            {
+              "id": 70000001,
+              "name": "Barbarian Camp",
+              "districtHallLevel": 5,
+              "destructionPercent": 100,
+              "stars": 3,
+              "attackCount": 3,
+              "totalLooted": 11442,
+              "attacks": [
+                {
+                  "attacker": {
+                    "tag": "#280GCCGYV",
+                    "name": "ItzSmokes"
+                  },
+                  "destructionPercent": 100,
+                  "stars": 3
+                },
+                {
+                  "attacker": {
+                    "tag": "#280GCCGYV",
+                    "name": "ItzSmokes"
+                  },
+                  "destructionPercent": 55,
+                  "stars": 1
+                },
+                {
+                  "attacker": {
+                    "tag": "#280GCCGYV",
+                    "name": "ItzSmokes"
+                  },
+                  "destructionPercent": 40,
+                  "stars": 0
+                }
+              ]
+            },
+            {
+              "id": 70000002,
+              "name": "Wizard Valley",
+              "districtHallLevel": 5,
+              "destructionPercent": 100,
+              "stars": 3,
+              "attackCount": 3,
+              "totalLooted": 10832,
+              "attacks": [
+                {
+                  "attacker": {
+                    "tag": "#280GCCGYV",
+                    "name": "ItzSmokes"
+                  },
+                  "destructionPercent": 100,
+                  "stars": 3
+                },
+                {
+                  "attacker": {
+                    "tag": "#280GCCGYV",
+                    "name": "ItzSmokes"
+                  },
+                  "destructionPercent": 82,
+                  "stars": 2
+                },
+                {
+                  "attacker": {
+                    "tag": "#280GCCGYV",
+                    "name": "ItzSmokes"
+                  },
+                  "destructionPercent": 45,
+                  "stars": 1
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "defenseLog": [
+        {
+          "attacker": {
+            "tag": "#2PPGYQQCR",
+            "name": ":)",
+            "level": 14,
+            "badgeUrls": {
+              "small": "https://api-assets.clashofclans.com/badges/70/Gd32HORi6b5EOPSVFqtbw5xbs-v-YkDr0ogtaXlykCE.png",
+              "large": "https://api-assets.clashofclans.com/badges/512/Gd32HORi6b5EOPSVFqtbw5xbs-v-YkDr0ogtaXlykCE.png",
+              "medium": "https://api-assets.clashofclans.com/badges/200/Gd32HORi6b5EOPSVFqtbw5xbs-v-YkDr0ogtaXlykCE.png"
+            }
+          },
+          "attackCount": 30,
+          "districtCount": 9,
+          "districtsDestroyed": 9,
+          "districts": [
+            {
+              "id": 70000000,
+              "name": "Capital Peak",
+              "districtHallLevel": 10,
+              "destructionPercent": 100,
+              "stars": 3,
+              "attackCount": 3,
+              "totalLooted": 13463,
+              "attacks": [
+                {
+                  "attacker": {
+                    "tag": "#GPRRL0VCP",
+                    "name": "rushed One"
+                  },
+                  "destructionPercent": 100,
+                  "stars": 3
+                },
+                {
+                  "attacker": {
+                    "tag": "#GPRRL0VCP",
+                    "name": "rushed One"
+                  },
+                  "destructionPercent": 37,
+                  "stars": 0
+                },
+                {
+                  "attacker": {
+                    "tag": "#GPRRL0VCP",
+                    "name": "rushed One"
+                  },
+                  "destructionPercent": 10,
+                  "stars": 0
+                }
+              ]
+            },
+            {
+              "id": 70000001,
+              "name": "Barbarian Camp",
+              "districtHallLevel": 5,
+              "destructionPercent": 100,
+              "stars": 3,
+              "attackCount": 4,
+              "totalLooted": 11841,
+              "attacks": [
+                {
+                  "attacker": {
+                    "tag": "#Y2VJP2GGQ",
+                    "name": "chrispzz"
+                  },
+                  "destructionPercent": 100,
+                  "stars": 3
+                },
+                {
+                  "attacker": {
+                    "tag": "#Y2VJP2GGQ",
+                    "name": "chrispzz"
+                  },
+                  "destructionPercent": 72,
+                  "stars": 1
+                },
+                {
+                  "attacker": {
+                    "tag": "#Y2VJP2GGQ",
+                    "name": "chrispzz"
+                  },
+                  "destructionPercent": 48,
+                  "stars": 0
+                },
+                {
+                  "attacker": {
+                    "tag": "#P2RQCRYLP",
+                    "name": "Bull Dog"
+                  },
+                  "destructionPercent": 25,
+                  "stars": 0
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "paging": {
+    "cursors": {}
+  }
+}

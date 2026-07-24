@@ -1,0 +1,13 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# pnpm 10 bloqueia postinstall por padrão. Estes precisam rodar: Prisma gera o client,
+# esbuild/unrs-resolver baixam o binário nativo, sharp otimiza imagem no build do Next.
+onlyBuiltDependencies:
+  - "@prisma/client"
+  - "@prisma/engines"
+  - esbuild
+  - prisma
+  - sharp
+  - unrs-resolver

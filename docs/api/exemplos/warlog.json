@@ -1,0 +1,104 @@
+{
+  "items": [
+    {
+      "result": "lose",
+      "endTime": "20251114T104728.000Z",
+      "teamSize": 45,
+      "attacksPerMember": 2,
+      "battleModifier": "none",
+      "clan": {
+        "tag": "#29Y8PRCJR",
+        "name": "U.S.A FREEDOM",
+        "badgeUrls": {
+          "small": "https://api-assets.clashofclans.com/badges/70/zAqCujNkyz9R9jgjq-G3Vaq2-X4GxRD0rPPyVbeh7z8.png",
+          "large": "https://api-assets.clashofclans.com/badges/512/zAqCujNkyz9R9jgjq-G3Vaq2-X4GxRD0rPPyVbeh7z8.png",
+          "medium": "https://api-assets.clashofclans.com/badges/200/zAqCujNkyz9R9jgjq-G3Vaq2-X4GxRD0rPPyVbeh7z8.png"
+        },
+        "clanLevel": 30,
+        "attacks": 70,
+        "stars": 113,
+        "destructionPercentage": 93.62222,
+        "expEarned": 678
+      },
+      "opponent": {
+        "tag": "#20P8G2GV",
+        "name": "Legendarii",
+        "badgeUrls": {
+          "small": "https://api-assets.clashofclans.com/badges/70/QDJv2MXenW9p0H_TBKzvVqm2NXKrrS9xjbEgXlvvalM.png",
+          "large": "https://api-assets.clashofclans.com/badges/512/QDJv2MXenW9p0H_TBKzvVqm2NXKrrS9xjbEgXlvvalM.png",
+          "medium": "https://api-assets.clashofclans.com/badges/200/QDJv2MXenW9p0H_TBKzvVqm2NXKrrS9xjbEgXlvvalM.png"
+        },
+        "clanLevel": 33,
+        "stars": 135,
+        "destructionPercentage": 100.0
+      }
+    },
+    {
+      "result": "win",
+      "endTime": "20251112T102931.000Z",
+      "teamSize": 40,
+      "attacksPerMember": 2,
+      "battleModifier": "none",
+      "clan": {
+        "tag": "#29Y8PRCJR",
+        "name": "U.S.A FREEDOM",
+        "badgeUrls": {
+          "small": "https://api-assets.clashofclans.com/badges/70/zAqCujNkyz9R9jgjq-G3Vaq2-X4GxRD0rPPyVbeh7z8.png",
+          "large": "https://api-assets.clashofclans.com/badges/512/zAqCujNkyz9R9jgjq-G3Vaq2-X4GxRD0rPPyVbeh7z8.png",
+          "medium": "https://api-assets.clashofclans.com/badges/200/zAqCujNkyz9R9jgjq-G3Vaq2-X4GxRD0rPPyVbeh7z8.png"
+        },
+        "clanLevel": 30,
+        "attacks": 78,
+        "stars": 118,
+        "destructionPercentage": 99.775,
+        "expEarned": 651
+      },
+      "opponent": {
+        "tag": "#2RQPU0PU",
+        "name": "Fighting House",
+        "badgeUrls": {
+          "small": "https://api-assets.clashofclans.com/badges/70/d9g2OZopltRTQuXezgOvnLKO4Jv3BvaP8FY0QSdmzus.png",
+          "large": "https://api-assets.clashofclans.com/badges/512/d9g2OZopltRTQuXezgOvnLKO4Jv3BvaP8FY0QSdmzus.png",
+          "medium": "https://api-assets.clashofclans.com/badges/200/d9g2OZopltRTQuXezgOvnLKO4Jv3BvaP8FY0QSdmzus.png"
+        },
+        "clanLevel": 28,
+        "stars": 86,
+        "destructionPercentage": 78.325
+      }
+    },
+    {
+      "result": null,
+      "endTime": "20251110T024114.000Z",
+      "teamSize": 30,
+      "attacksPerMember": 1,
+      "battleModifier": "none",
+      "clan": {
+        "tag": "#29Y8PRCJR",
+        "name": "U.S.A FREEDOM",
+        "badgeUrls": {
+          "small": "https://api-assets.clashofclans.com/badges/70/zAqCujNkyz9R9jgjq-G3Vaq2-X4GxRD0rPPyVbeh7z8.png",
+          "large": "https://api-assets.clashofclans.com/badges/512/zAqCujNkyz9R9jgjq-G3Vaq2-X4GxRD0rPPyVbeh7z8.png",
+          "medium": "https://api-assets.clashofclans.com/badges/200/zAqCujNkyz9R9jgjq-G3Vaq2-X4GxRD0rPPyVbeh7z8.png"
+        },
+        "clanLevel": 30,
+        "attacks": 208,
+        "stars": 588,
+        "destructionPercentage": 633.5333,
+        "expEarned": 0
+      },
+      "opponent": {
+        "badgeUrls": {
+          "small": "https://api-assets.clashofclans.com/badges/70/H39b_-WLZGtZVWQ0hqTkE-Tn2AaQnQWy_Iz4yBlvL0M.png",
+          "large": "https://api-assets.clashofclans.com/badges/512/H39b_-WLZGtZVWQ0hqTkE-Tn2AaQnQWy_Iz4yBlvL0M.png",
+          "medium": "https://api-assets.clashofclans.com/badges/200/H39b_-WLZGtZVWQ0hqTkE-Tn2AaQnQWy_Iz4yBlvL0M.png"
+        },
+        "clanLevel": 0,
+        "stars": 413,
+        "destructionPercentage": 0.0
+      }
+    }
+  ],
+  "paging": {
+    "cursors": {}
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "403_privateWarLog": {
+    "reason": "accessDenied"
+  },
+  "400_badRequest": {
+    "reason": "badRequest",
+    "message": "Unknown value for parameter locationId"
+  },
+  "404_notFound": {
+    "reason": "notFound",
+    "message": "Not found with tag 2PP"
+  },
+  "403_missingAuth_observado_em_2026-07": {
+    "reason": "accessDenied",
+    "message": "Missing authorization"
+  },
+  "200_notInWar": {
+    "state": "notInWar",
+    "clan": {
+      "badgeUrls": {
+        "small": "https://api-assets.clashofclans.com/badges/70/H39b_-WLZGtZVWQ0hqTkE-Tn2AaQnQWy_Iz4yBlvL0M.png",
+        "large": "https://api-assets.clashofclans.com/badges/512/H39b_-WLZGtZVWQ0hqTkE-Tn2AaQnQWy_Iz4yBlvL0M.png",
+        "medium": "https://api-assets.clashofclans.com/badges/200/H39b_-WLZGtZVWQ0hqTkE-Tn2AaQnQWy_Iz4yBlvL0M.png"
+      },
+      "clanLevel": 0,
+      "attacks": 0,
+      "stars": 0,
+      "destructionPercentage": 0
+    },
+    "opponent": {
+      "badgeUrls": {
+        "small": "https://api-assets.clashofclans.com/badges/70/H39b_-WLZGtZVWQ0hqTkE-Tn2AaQnQWy_Iz4yBlvL0M.png",
+        "large": "https://api-assets.clashofclans.com/badges/512/H39b_-WLZGtZVWQ0hqTkE-Tn2AaQnQWy_Iz4yBlvL0M.png",
+        "medium": "https://api-assets.clashofclans.com/badges/200/H39b_-WLZGtZVWQ0hqTkE-Tn2AaQnQWy_Iz4yBlvL0M.png"
+      },
+      "clanLevel": 0,
+      "attacks": 0,
+      "stars": 0,
+      "destructionPercentage": 0
+    }
+  },
+  "200_verifytoken": {
+    "tag": "#2PP",
+    "token": "TOKEN",
+    "status": "ok"
+  },
+  "200_goldpass": {
+    "startTime": "20230601T080100.000Z",
+    "endTime": "20230701T080000.000Z"
+  }
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="ClashPilot">
+  <rect width="512" height="512" rx="112" fill="#0b0b0f"/>
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#2b2b36" stroke-width="28"/>
+  <path d="M256 106a150 150 0 0 1 129.9 75" fill="none" stroke="#5b6ef5" stroke-width="28" stroke-linecap="round"/>
+  <path d="M256 176l70 121H186z" fill="#5b6ef5"/>
+</svg>
