@@ -12,32 +12,34 @@ Idioma do produto e dos commits: **português (pt-BR)**.
 ## 1. TL;DR — onde paramos
 
 Fases **0 a 7 e 6 entregues e no ar** (a ordem de execução não seguiu a numeração do roadmap).
-Tudo commitado e deployado. **102 testes passando**, typecheck strict sem `any`, build verde.
+Tudo commitado e deployado. **104 testes passando**, typecheck strict sem `any`, build verde.
 
-**Primeira validação contra vila real feita (2026-07-24) — e valeu ouro: achou DOIS bugs de
-catálogo.** A vila `#GR0VR9VGP` (`PHANT0MX`, TH6) é do próprio Alan (não é de teste; NÃO apagar).
-Rodar o `sanity` nela, item a item, escancarou:
+**Validação contra a vila real do Alan (2026-07-24) — achou QUATRO bugs de catálogo/mapper.** A
+vila `#GR0VR9VGP` (`PHANT0MX`, TH6, subindo pra TH7) é do próprio Alan (não é teste; NÃO apagar). O
+`sanity` + o **export cru da vila** (JSON do jogo, colado no chat) escancararam, em ordem:
 
-1. **Gating pelo prédio produtor** — tropas/feitiços de elixir negro (Golem, Bowler, Veneno…)
-   apareciam liberados já em ~TH3 porque o gerador gateava só pelo nível de Laboratório e ignorava
-   o prédio que PRODUZ a unidade. Fix: `minTownHall = max(TH do Lab, TH do prédio produtor)` via
-   `ProductionBuilding`+`BarrackLevel`/`SpellForgeLevel`.
-2. **Entradas-fantasma** — 11 itens não-treináveis (habilidades de Super Tropa `InvisibilityST`/
-   `RageST`/`PoisonST`, protótipos, clone defensivo `Miner_DEF`) inflavam o denominador do exército.
-   O `InvisibilityST` sozinho metia 8M de elixir "faltando" num TH6. Fix: filtrar `DisableProduction`.
+1. **Gating pelo prédio produtor** — elixir negro (Golem, Bowler, Veneno…) liberado já em ~TH3
+   porque o gerador gateava só pelo Laboratório. Fix: `max(TH do Lab, TH do prédio produtor)`.
+2. **Entradas-fantasma** — 11 itens não-treináveis (`InvisibilityST`/`RageST`, protótipos,
+   `Miner_DEF`) inflavam o denominador; o `InvisibilityST` metia 8M. Fix: filtrar `DisableProduction`.
+3. **Off-by-one no gating por Laboratório** — o `LaboratoryLevel` de uma linha é o Lab do nível
+   DAQUELA linha, mas o `UpgradeCost` é o custo para o PRÓXIMO. O gerador lia o requisito da linha
+   errada e inflava o teto em 1: dizia "Bárbaro nível 4 no CV6" quando o jogo exige Lab 5 (=CV7).
+   Fix: ler o `LaboratoryLevel` da linha que descreve o nível. Validado contra o export (Lab 4/CV6
+   ⇒ Bárbaro para no 3, Raio no 4 — o teto real).
+4. **Nome da API ≠ nome interno** — catálogo usa nome de arquivo (`LighningStorm`, `Gargoyle`), a
+   API usa exibição (`Lightning Spell`, `Minion`); o mapper casava crus e o feitiço do jogador
+   virava nível 0. Fix: `GENERATED_API_ALIASES` (gerado do `localization/texts.csv`) +
+   `catalogKeyForApiName` no mapper. Nenhuma chave interna mudou.
 
-Efeito acumulado no TH6 real: progresso do exército **1,3% → 25,6%**, denominador 129,7M → **6,62M**,
-upgrades no CV **111 → 17**, caminho crítico 157d → **~5d**, zero elixir negro. Ambos travados por
-âncoras em `src/generated.test.ts`.
+**Resultado:** com os 4 fixes, TODAS as tropas/feitiços do Alan aparecem no máximo do CV6 — como ele
+afirmava ("tá tudo full"). O app é que estava errado. O "75%" que ele via era o exército
+(subcontado) puxando; agora bate.
 
-**Aprendizado de produto:** o Alan marcou as CONSTRUÇÕES no máximo em `/vila` (Village Ledger) e
-estranhou o dashboard mostrar 75% em vez de 100%. Está correto: "VILA MÁXIMA" = maximizar TUDO no
-CV atual, e o **exército** vem da API do jogo (não do ledger) — as tropas dele estão um nível abaixo
-do máximo do CV6 e os feitiços zerados (~25%). Vale considerar mostrar o breakdown por categoria no
-dashboard para deixar óbvio "o que está te segurando é o Laboratório".
-
-**Pendência que ainda atravessa tudo:** validar THs mais altos (com heróis e ledger cheio); a
-cobertura segue 27,7% quando o ledger está vazio.
+**Pendências:** (a) **nomes em pt-BR** de tropas/feitiços na UI — o CDN só expõe `texts.csv` em EN
+(403 em variantes PT); hoje `name`/`ptName` = nome público EN. Precisa de tabela de tradução curada
+(é texto, não número de balanceamento). (b) validar THs mais altos (heróis, ledger cheio). (c) ideia
+de produto: breakdown por categoria no dashboard, para deixar claro o que segura o progresso.
 
 ### Como fazer a validação (a tarefa pendente)
 
@@ -174,6 +176,16 @@ Pipeline em `packages/coc-data/scripts/` (baixa, decodifica LZMA, faz cache, tra
   defensivo `Miner_DEF`, que antes inflavam o denominador do exército. `EnabledByCalendar` (Super
   Tropa por evento) já era filtrado; `DisableProduction` foi somado em 2026-07-24. Army caiu de 65
   para 54 itens; âncora trava a exclusão.
+- Alinhamento linha↔nível (tropas/feitiços): o `LaboratoryLevel` de uma linha é o Lab exigido para
+  TER aquele nível; o `UpgradeCost` da MESMA linha é o custo de subir para o PRÓXIMO. Logo o
+  requisito de Lab do nível de catálogo `index+2` vem da linha SEGUINTE (`object.levels[index+1]`).
+  Ler da própria linha inflava o teto em 1 (off-by-one, corrigido 2026-07-24). Âncora: Bárbaro cap
+  CV6=3 e nível 4=CV7; Raio cap CV6=4.
+- Ponte de nomes API↔catálogo: `GENERATED_API_ALIASES` (mapa `nome-público→chave-interna`, gerado do
+  `localization/texts.csv`) + `catalogKeyForApiName`. As unidades (army/hero/pet/equipment) recebem o
+  nome público EN como `name`/`ptName`; o mapper resolve a chave por aí. Sem isso, `Lightning Spell`
+  não casava com `lighningstorm` e o feitiço virava nível 0. `texts.csv` do CDN é **só EN** — nomes
+  pt-BR ficam pendentes (tabela curada).
 - **Limite conhecido:** entre TH14–TH16 o denominador de pets é otimista (o mapa pet→nível da
   Casa de Pets não existe nos arquivos). Erro na categoria de menor peso (0,07), nulo abaixo de TH14.
 
