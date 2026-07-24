@@ -5,6 +5,8 @@ import { categoryImbalance, computeVillageScore } from "./village-score.js";
 const progress = (bps: readonly number[], totalBp: number): MaxProgressResult => ({
   totalBp,
   reliable: true,
+  unknownCategories: [],
+  coverageBp: 10_000,
   byCategory: bps.map((progressBp, i) => ({
     category: (["defense", "hero", "army", "wall"] as const)[i] ?? "defense",
     progressBp,
@@ -89,7 +91,13 @@ describe("computeVillageScore", () => {
 
   it("propaga reliable=false do progresso", () => {
     const r = computeVillageScore({
-      progress: { totalBp: 0, byCategory: [], reliable: false },
+      progress: {
+        totalBp: 0,
+        byCategory: [],
+        reliable: false,
+        unknownCategories: [],
+        coverageBp: 0,
+      },
       priorityAdherence: null,
       activeDays: 0,
       windowDays: 14,

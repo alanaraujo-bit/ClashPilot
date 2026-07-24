@@ -13,6 +13,14 @@ export const metadata: Metadata = { title: "Dashboard" };
 
 const unitsSchema = z.array(unitSchema);
 
+/** O breakdown guarda a cobertura dos dados — ver `MaxProgressBar` e ADR-003. */
+const breakdownSchema = z
+  .object({
+    coverageBp: z.number().nullable().default(null),
+    unknownCategories: z.array(z.string()).default([]),
+  })
+  .catch({ coverageBp: null, unknownCategories: [] });
+
 export default async function DashboardPage() {
   const player = await getPrimaryPlayer();
   if (!player) redirect("/link-player");
@@ -32,6 +40,7 @@ export default async function DashboardPage() {
   // O Json do banco é validado antes de virar UI — dado de banco também é fronteira.
   const parsedUnits = unitsSchema.safeParse(current.units);
   const units = parsedUnits.success ? parsedUnits.data : [];
+  const breakdown = breakdownSchema.parse(current.scoreBreakdown);
   const heroes = units.filter((u) => u.category === "hero" && u.village === "home");
   const home = units.filter((u) => u.village === "home");
 
@@ -55,6 +64,8 @@ export default async function DashboardPage() {
         progressBp={current.maxProgressBp}
         townHallLevel={current.townHallLevel}
         villageScore={current.villageScore}
+        coverageBp={breakdown.coverageBp}
+        unknownCategories={breakdown.unknownCategories}
       />
 
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">

@@ -21,7 +21,12 @@ export function toAchievementScope(value: string): AchievementScope {
   return KNOWN_SCOPES.includes(value) ? (value as AchievementScope) : "other";
 }
 
-export type Resource = "gold" | "elixir" | "darkElixir" | "gems";
+/**
+ * Recursos de upgrade. Os minérios (`*Ore`) são a economia exclusiva dos equipamentos de
+ * herói — nunca são comparados com ouro/elixir, só entre si dentro da própria categoria.
+ */
+export type Resource =
+  "gold" | "elixir" | "darkElixir" | "gems" | "commonOre" | "rareOre" | "epicOre";
 
 export type UnitCategory =
   "troop" | "spell" | "hero" | "pet" | "equipment" | "siege" | "building" | "wall" | "trap";

@@ -114,6 +114,55 @@ via `Intl`.
 **Consequência.** Custo inicial pequeno; abre o mercado de língua inglesa (muito maior) sem
 refatoração.
 
+## ADR-014 — Catálogo vem dos arquivos de lógica oficiais do jogo
+
+**Contexto.** A Fase 3 precisava de custo e tempo de ~2.300 níveis. Wiki é digitada por gente e
+envelhece; digitar à mão é pior ainda. Um número errado corrompe MAX%, ROI e calculadoras **em
+silêncio** — o usuário não tem como perceber.
+
+**Decisão.** Gerar `packages/coc-data/src/generated/catalog.ts` a partir de
+`https://game-assets.clashofclans.com/{fingerprint}/logic/*.csv` — o mesmo CDN que o cliente do
+jogo usa. Os arquivos vêm com header de assinatura de 68 bytes + LZMA com header não-padrão de
+9 bytes; o pipeline (`scripts/`) baixa, decodifica, faz cache local e transforma.
+
+Semântica de custo, **verificada e não suposta**:
+
+| Fonte           | Regra                                                   | Prova                                                |
+| --------------- | ------------------------------------------------------- | ---------------------------------------------------- |
+| Prédios         | linha N = nível N, custo para **atingi-lo**             | Canhão nível 1 = 250 de ouro                         |
+| Heróis          | idem; o nível 1 é o altar                               | Rei Bárbaro nível 1 = 5.000 EN no TH7                |
+| Tropas/feitiços | linha N = upgrade **de** N **para** N+1; nível 1 grátis | Bárbaro tem 12 linhas e a API devolve `maxLevel: 13` |
+
+**Consequências.**
+
+- (+) Os números são exatamente os do jogo, e atualizar é trocar um fingerprint e rodar um comando.
+- (+) A tabela de Centros de Vila deixou de ser escrita à mão — e a derivação já corrigiu um erro
+  meu de memória (muralha no TH9 vai até o nível 10, não 9).
+- (+) Testes de integridade travam os valores-âncora: se a Supercell trocar a semântica, o CI
+  quebra antes de o número errado chegar ao usuário.
+- (−) O fingerprint precisa ser atualizado a cada balance update (tarefa recorrente já prevista).
+- (−) Equipamentos usam minério e um nível pode custar dois tipos; somamos as quantidades e isso
+  só é legítimo porque a razão fica **dentro** da categoria.
+
+## ADR-015 — Progresso distingue "não construído" de "não sabemos"
+
+**Contexto.** Com o catálogo pronto, a primeira execução contra uma conta real (TH8) devolveu
+**1,6%**. O motor estava colocando defesas, muralhas, armadilhas e infraestrutura no denominador
+com numerador zero — porque a API não expõe esses dados e o Village Ledger ainda não existe.
+Tecnicamente "correto", e completamente enganoso: dizia ao usuário que a vila dele estava zerada.
+
+**Decisão.** `computeMaxProgress` recebe `knownCategories`. Categoria sem fonte de dados sai do
+cálculo (numerador **e** denominador) e é reportada em `unknownCategories`, junto de um
+`coverageBp` — a fatia do peso da vila que o número realmente cobre. A UI mostra a cobertura e
+o que falta, com o caminho para preencher o registro da vila.
+
+**Consequências.**
+
+- (+) O número passa a significar o que diz. Para a mesma conta: 2,9% **sobre 53% de cobertura**.
+- (+) O histórico grava a cobertura: um "2,9%" antigo não fica indistinguível de uma vila parada.
+- (+) Dá ao Village Ledger uma motivação visível e honesta, em vez de um formulário sem razão.
+- (−) Duas grandezas para explicar na UI em vez de uma.
+
 ## ADR-013 — Prisma sem engine nativo (`engineType = "client"`)
 
 **Contexto.** Três deploys seguidos falharam com `PrismaClientInitializationError` em produção

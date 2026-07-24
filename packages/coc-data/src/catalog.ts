@@ -1,19 +1,18 @@
+import { GENERATED_CATALOG } from "./generated/catalog.js";
 import type { CatalogEntry, TownHallLevel } from "./types.js";
 
 /**
- * Registro do catálogo.
+ * Catálogo do jogo: custo, tempo e Centro de Vila mínimo de cada nível.
  *
- * ⚠️ ESTADO: vazio de propósito na Fase 0.
+ * Gerado a partir dos arquivos de lógica oficiais do Clash of Clans (o mesmo CDN que o jogo
+ * usa), nunca digitado à mão. Regenerar após um balance update:
  *
- * Preencher com custo/tempo reais de cada nível é a **Fase 3** do roadmap e a maior tarefa de
- * dados do projeto (docs/09-roadmap.md). Nada aqui pode ser "chutado": um número errado
- * corrompe o MAX% e o ROI de todos os usuários de forma silenciosa.
+ *     pnpm --filter @clashpilot/coc-data build:catalog
  *
- * Toda a matemática que consome este catálogo já está implementada e testada em
- * `@clashpilot/core` — ela recebe o catálogo por parâmetro, então o motor fica pronto antes
- * dos dados e passa a produzir números reais assim que o catálogo for preenchido.
+ * Os valores estão travados por testes de integridade em `catalog.test.ts` — se a Supercell
+ * mudar a semântica dos arquivos, o CI quebra antes de o número errado chegar ao usuário.
  */
-export const CATALOG: readonly CatalogEntry[] = [];
+export const CATALOG: readonly CatalogEntry[] = GENERATED_CATALOG;
 
 export type Catalog = readonly CatalogEntry[];
 

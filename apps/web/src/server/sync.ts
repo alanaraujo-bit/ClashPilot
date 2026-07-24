@@ -2,7 +2,7 @@ import "server-only";
 
 import { CATALOG, SCORE_VERSION } from "@clashpilot/coc-data";
 import type { PlayerProfileDto } from "@clashpilot/contracts";
-import { computeMaxProgress, computeVillageScore } from "@clashpilot/core";
+import { API_KNOWN_CATEGORIES, computeMaxProgress, computeVillageScore } from "@clashpilot/core";
 import { type Prisma, prisma } from "@clashpilot/db";
 
 /**
@@ -23,6 +23,7 @@ export function computeMetrics(profile: PlayerProfileDto, activeDays: number) {
     catalog: CATALOG,
     townHallLevel: profile.townHallLevel,
     // Super Tropa ativa é estado temporário e Builder Base é outra vila: fora do progresso.
+    knownCategories: API_KNOWN_CATEGORIES,
     units: profile.units
       .filter((u) => u.village === "home" && u.superTroopActive !== true)
       .map((u) =>
@@ -56,7 +57,14 @@ export async function persistProfile(
 
   const units = profile.units as unknown as Prisma.InputJsonValue;
   const achievements = profile.achievements as unknown as Prisma.InputJsonValue;
-  const breakdown = score.factors as unknown as Prisma.InputJsonValue;
+  // O breakdown guarda também a COBERTURA: sem ela, um "2,9%" no histórico ficaria
+  // indistinguível de uma vila realmente parada em 2,9%.
+  const breakdown = {
+    factors: score.factors,
+    coverageBp: progress.coverageBp,
+    unknownCategories: progress.unknownCategories,
+    byCategory: progress.byCategory,
+  } as unknown as Prisma.InputJsonValue;
 
   const common = {
     townHallLevel: profile.townHallLevel,

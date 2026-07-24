@@ -28,12 +28,19 @@ export interface CategoryProgress {
 }
 
 export interface MaxProgressResult {
-  /** Progresso geral em basis points (0..10000). */
+  /** Progresso geral em basis points (0..10000), calculado SÓ sobre categorias conhecidas. */
   readonly totalBp: number;
   readonly byCategory: readonly CategoryProgress[];
+  /** Categorias que existem no TH atual mas para as quais não temos fonte de dados. */
+  readonly unknownCategories: readonly ScoreCategory[];
   /**
-   * `false` quando nenhuma categoria tinha custo conhecido — o catálogo ainda não foi
-   * preenchido (Fase 3). A UI não deve exibir o número como fato nesse caso.
+   * Fatia do peso total que temos como conhecida, em basis points. 10000 = vila inteira
+   * coberta; 3300 = só um terço do peso tem dado, e o número geral vale pouco sozinho.
+   */
+  readonly coverageBp: number;
+  /**
+   * `false` quando nenhuma categoria conhecida tinha custo — catálogo vazio ou sem dados.
+   * A UI não deve exibir o número como fato nesse caso.
    */
   readonly reliable: boolean;
 }
@@ -43,7 +50,26 @@ export interface MaxProgressInput {
   readonly townHallLevel: TownHallLevel;
   /** Estado da vila. Itens ausentes contam como nível 0 — ausência ≠ inexistente. */
   readonly units: readonly UnitState[];
+  /**
+   * Categorias para as quais existe fonte de dados confiável.
+   *
+   * Sem isto, defesas e muralhas entrariam no denominador com numerador zero e o app
+   * anunciaria "vila 1,6% completa" para um TH8 — quando a verdade é "só conhecemos o
+   * exército". Distinguir *não construído* de *não sabemos* é o núcleo do ADR-003.
+   *
+   * Omitir = considerar tudo conhecido (usado nos testes e quando o Village Ledger está
+   * completo).
+   */
+  readonly knownCategories?: ReadonlySet<ScoreCategory>;
 }
+
+/** O que a API oficial entrega sozinha, sem o Village Ledger (docs/00 §2.1). */
+export const API_KNOWN_CATEGORIES: ReadonlySet<ScoreCategory> = new Set([
+  "army",
+  "hero",
+  "pet",
+  "equipment",
+]);
 
 const BP = 10_000;
 
@@ -86,15 +112,26 @@ export function computeMaxProgress(input: MaxProgressInput): MaxProgressResult {
     invested.set(entry.scoreCategory, (invested.get(entry.scoreCategory) ?? 0) + owned);
   }
 
-  const present: CategoryProgress[] = [];
-  let weightSum = 0;
+  const known: CategoryProgress[] = [];
+  const unknownCategories: ScoreCategory[] = [];
+  let knownWeight = 0;
+  let existingWeight = 0;
 
   for (const [category, weight] of Object.entries(CATEGORY_WEIGHTS) as [ScoreCategory, number][]) {
     const req = required.get(category) ?? 0;
+    // Categoria que nem existe neste TH sai da conta inteira: uma vila TH2 não tem heróis,
+    // e o peso de herói não pode virar 20% de progresso perdido para sempre.
     if (req <= 0) continue;
+    existingWeight += weight;
+
+    if (input.knownCategories && !input.knownCategories.has(category)) {
+      unknownCategories.push(category);
+      continue;
+    }
+
     const inv = invested.get(category) ?? 0;
-    weightSum += weight;
-    present.push({
+    knownWeight += weight;
+    known.push({
       category,
       progressBp: Math.round(Math.min(inv / req, 1) * BP),
       investedCost: inv,
@@ -103,17 +140,21 @@ export function computeMaxProgress(input: MaxProgressInput): MaxProgressResult {
     });
   }
 
-  if (present.length === 0) {
-    return { totalBp: 0, byCategory: [], reliable: false };
+  if (known.length === 0) {
+    return { totalBp: 0, byCategory: [], unknownCategories, coverageBp: 0, reliable: false };
   }
 
-  // Renormaliza os pesos sobre as categorias existentes: uma vila de TH2 não tem heróis,
-  // e o peso de herói não pode virar 20% de progresso perdido para sempre.
   const totalBp = Math.round(
-    present.reduce((acc, c) => acc + (c.weight / weightSum) * c.progressBp, 0),
+    known.reduce((acc, c) => acc + (c.weight / knownWeight) * c.progressBp, 0),
   );
 
-  return { totalBp, byCategory: present, reliable: true };
+  return {
+    totalBp,
+    byCategory: known,
+    unknownCategories,
+    coverageBp: existingWeight > 0 ? Math.round((knownWeight / existingWeight) * BP) : 0,
+    reliable: true,
+  };
 }
 
 /** 7240 → "72,4%" */

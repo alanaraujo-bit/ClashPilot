@@ -102,11 +102,52 @@ describe("computeMaxProgress", () => {
     expect(r.totalBp).toBe(5_238);
   });
 
-  it("marca reliable=false quando o catálogo ainda está vazio (Fase 3 pendente)", () => {
+  it("marca reliable=false quando o catálogo está vazio", () => {
     const r = computeMaxProgress({ catalog: [], townHallLevel: 14, units: [] });
     expect(r.reliable).toBe(false);
     expect(r.totalBp).toBe(0);
     expect(r.byCategory).toHaveLength(0);
+    expect(r.coverageBp).toBe(0);
+  });
+
+  describe("categorias sem fonte de dados", () => {
+    it("não conta categoria desconhecida como 0% — ela sai da conta e vira cobertura", () => {
+      // Sem o Village Ledger não sabemos nada de defesa. Herói no máximo, defesa ignorada.
+      const r = computeMaxProgress({
+        catalog,
+        townHallLevel: 5,
+        units: [{ key: "king", level: 3 }],
+        knownCategories: new Set(["hero"]),
+      });
+
+      expect(r.totalBp).toBe(10_000); // 100% do que sabemos, não 47% do que não sabemos
+      expect(r.byCategory.map((c) => c.category)).toEqual(["hero"]);
+      expect(r.unknownCategories).toEqual(["defense"]);
+      // hero 0,20 de 0,42 existentes ⇒ 47,62% de cobertura
+      expect(r.coverageBp).toBe(4_762);
+    });
+
+    it("cobertura é 10000 quando toda categoria existente é conhecida", () => {
+      const r = computeMaxProgress({
+        catalog,
+        townHallLevel: 5,
+        units: [],
+        knownCategories: new Set(["hero", "defense"]),
+      });
+      expect(r.coverageBp).toBe(10_000);
+      expect(r.unknownCategories).toEqual([]);
+    });
+
+    it("reliable=false quando NENHUMA categoria existente é conhecida", () => {
+      const r = computeMaxProgress({
+        catalog,
+        townHallLevel: 5,
+        units: [{ key: "king", level: 3 }],
+        knownCategories: new Set(["pet"]),
+      });
+      expect(r.reliable).toBe(false);
+      expect([...r.unknownCategories].sort()).toEqual(["defense", "hero"]);
+    });
   });
 });
 
