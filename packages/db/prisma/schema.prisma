@@ -5,14 +5,15 @@
 // separado do verificado (`source` + `confidence`), e nenhum Json onde exista query.
 
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["relationJoins"]
-  // Gerar DENTRO do pacote, não no node_modules/.pnpm: com pnpm isolado, o file tracing do
-  // Next não segue o link simbólico e a função serverless sobe sem o engine
-  // (`PrismaClientInitializationError` em produção, tudo verde no local).
-  output          = "../generated/client"
-  // `native` para o dev em Windows; `rhel-openssl-3.0.x` é o runtime da Vercel.
-  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
+  provider = "prisma-client-js"
+  output   = "../generated/client"
+
+  // `queryCompiler` + `driverAdapters` geram um client 100% JavaScript, SEM o engine nativo
+  // em Rust. Isso elimina de vez a classe de erro que nos custou três deploys: o
+  // `libquery_engine-*.so.node` não é um import, então nenhum bundler o enxerga e o file
+  // tracing da Vercel não o copia para a função. Sem binário, não há o que copiar.
+  // Bônus: cold start menor e o mesmo client funciona em qualquer runtime.
+  previewFeatures = ["queryCompiler", "driverAdapters", "relationJoins"]
 }
 
 datasource db {
