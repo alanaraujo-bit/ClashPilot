@@ -9,8 +9,16 @@ Analisa os dados da API oficial, guarda histórico e transforma isso em decisõe
 
 ## Estado atual
 
-🟡 **Fase de planejamento concluída.** Nenhum código de aplicação escrito ainda — por decisão
-do briefing, os 11 itens de levantamento vêm antes da implementação.
+🟢 **Fase 0 concluída e no ar.**
+
+|         |                                                       |
+| ------- | ----------------------------------------------------- |
+| Web     | https://clashpilot.vercel.app                         |
+| Gateway | https://gateway-production-c67a.up.railway.app/health |
+| Deploy  | automático a cada `push` em `main`                    |
+
+Detalhes de infraestrutura, variáveis e o passo bloqueante (chave da API) em
+[docs/11-operacao.md](docs/11-operacao.md).
 
 ## Documentação
 
@@ -27,6 +35,7 @@ do briefing, os 11 itens de levantamento vêm antes da implementação.
 | [08 — Wireframes](docs/08-wireframes.md)           | Todas as telas                                            |
 | [09 — Roadmap](docs/09-roadmap.md)                 | Fases 0–10 + diferenciais propostos                       |
 | [10 — Decisões (ADRs)](docs/10-decisoes.md)        | Decisões arquiteturais e seus porquês                     |
+| [11 — Operação](docs/11-operacao.md)               | Ambientes no ar, variáveis, armadilhas de deploy          |
 | [docs/api/](docs/api/)                             | Referência exaustiva da API oficial                       |
 
 ## Stack
