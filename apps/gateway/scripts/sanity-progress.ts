@@ -14,6 +14,9 @@ import {
   computeMaxProgress,
   computeVillageScore,
   formatBp,
+  rankByTrack,
+  computeRemainingWork,
+  formatDuration,
 } from "@clashpilot/core";
 
 const base = process.env["COC_GATEWAY_URL"] ?? "https://gateway-production-c67a.up.railway.app";
@@ -95,3 +98,37 @@ for (const factor of score.factors) {
     `  ${factor.label.padEnd(30)} ${String(factor.value).padStart(6)}  peso ${factor.weight.toFixed(2)}`,
   );
 }
+
+const planningInput = {
+  catalog: CATALOG,
+  townHallLevel: player.townHallLevel,
+  units,
+  knownCategories: API_KNOWN_CATEGORIES,
+};
+
+console.log("\nPRÓXIMAS JOGADAS (filas paralelas):");
+for (const [track, list] of Object.entries(rankByTrack(planningInput, 3))) {
+  if (list.length === 0) continue;
+  console.log(`  ${track}:`);
+  for (const c of list) {
+    const roi = c.roiPerDay === null ? "instantâneo" : `${c.roiPerDay.toFixed(1)} bp/dia`;
+    console.log(
+      `    ${c.name} ${c.fromLevel}→${c.toLevel}  ${c.costAmount.toLocaleString("pt-BR")} ${c.costResource}  ${formatDuration(c.timeSec)}  ROI ${roi}`,
+    );
+  }
+}
+
+const remaining = computeRemainingWork({ ...planningInput, builders: 5 });
+
+console.log("\nFALTA NESTE CENTRO DE VILA (só categorias conhecidas):");
+console.log(`  ${remaining.upgrades} upgrades`);
+for (const [resource, amount] of Object.entries(remaining.costByResource)) {
+  console.log(`  ${resource.padEnd(12)} ${amount.toLocaleString("pt-BR")}`);
+}
+console.log("  tempo por trilha:");
+for (const t of remaining.byTrack) {
+  console.log(
+    `    ${t.track.padEnd(8)} ${String(t.upgrades).padStart(4)} upgrades · ${formatDuration(t.parallelTimeSec)}`,
+  );
+}
+console.log(`  caminho crítico: ${formatDuration(remaining.criticalPathSec)}`);

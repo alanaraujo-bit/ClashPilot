@@ -183,16 +183,41 @@ function fromBuildings(objects: CsvObject[]): Entry[] {
 
 // ───────────────────────────── Tropas, feitiços, heróis ────────────────────────────
 
-/** Menor TH que libera cada nível de laboratório — as tropas são travadas por lab, não por TH. */
-const labToTownHall = new Map<number, number>();
-for (const object of buildingObjects) {
-  if (object.name !== "Laboratory") continue;
-  for (const row of object.levels) {
-    const level = asInt(row["BuildingLevel"]);
-    const th = asInt(row["TownHallLevel"]);
-    if (level !== null && th !== null) labToTownHall.set(level, th);
+/**
+ * Menor TH que libera cada nível de um prédio "portão".
+ *
+ * Vários itens não são travados por Centro de Vila diretamente: tropa depende do Laboratório,
+ * equipamento depende da Ferraria (`Smithy`) e pet depende da Casa de Pets (`Pet Shop`).
+ * Sem essa tradução, o catálogo diz que um TH8 pode ter todos os pets — o que a primeira
+ * execução contra uma conta real escancarou.
+ */
+function gateLevelsToTownHall(buildingName: string): Map<number, number> {
+  const map = new Map<number, number>();
+  for (const object of buildingObjects) {
+    if (object.name !== buildingName) continue;
+    for (const row of object.levels) {
+      const level = asInt(row["BuildingLevel"]);
+      const th = asInt(row["TownHallLevel"]);
+      if (level !== null && th !== null) map.set(level, th);
+    }
   }
+  return map;
 }
+
+const labToTownHall = gateLevelsToTownHall("Laboratory");
+const smithyToTownHall = gateLevelsToTownHall("Smithy");
+const petShopToTownHall = gateLevelsToTownHall("Pet Shop");
+
+/** TH em que a Casa de Pets aparece — nenhum pet existe antes disso. */
+const PET_UNLOCK_TOWN_HALL = petShopToTownHall.get(1) ?? 14;
+/** TH em que a Ferraria aparece — nenhum equipamento existe antes disso. */
+const SMITHY_UNLOCK_TOWN_HALL = smithyToTownHall.get(1) ?? 8;
+
+/**
+ * Os arquivos trazem entradas de pet que não são pets jogáveis: invocações (`PhoenixEgg`),
+ * protótipos (`JumpAuraPet`, `SpeedupPet`) e itens removidos.
+ */
+const NON_PET = /(Pet|Egg|Removed|Cage)$/;
 
 /** Tropas e feitiços: linha N = upgrade de N para N+1. O nível 1 é gratuito. */
 function fromLabUpgrades(
@@ -324,12 +349,13 @@ function fromEquipment(objects: CsvObject[]): Entry[] {
         return ORE_RARITY.indexOf(r) > ORE_RARITY.indexOf(acc) ? r : acc;
       }, "commonOre");
 
+      const smithyLevel = asInt(row["RequiredBlacksmithLevel"]) ?? 1;
       levels.push({
         level: index + 1,
         cost: total,
         resource: rarest,
         buildTimeSec: 0, // equipamento é instantâneo: gasta minério, não tempo
-        minTownHall: 1,
+        minTownHall: smithyToTownHall.get(smithyLevel) ?? SMITHY_UNLOCK_TOWN_HALL,
       });
     });
 
@@ -341,6 +367,55 @@ function fromEquipment(objects: CsvObject[]): Entry[] {
       ptName: object.name,
       category: "equipment",
       scoreCategory: "equipment",
+      village: "home",
+      usesBuilder: false,
+      levels,
+    });
+  }
+  return entries;
+}
+
+/**
+ * Pets.
+ *
+ * `pets.csv` **não tem coluna de destravamento** — nem TH, nem nível da Casa de Pets. O que
+ * dá para afirmar com os dados é o piso: nenhum pet existe antes do TH em que a Casa de Pets
+ * aparece. Usamos esse piso para todos.
+ *
+ * ⚠️ Limite conhecido: no jogo, cada nível da Casa de Pets destrava um pet novo, então entre
+ * o TH14 e o TH16 o denominador de pets fica otimista (conta pets que ainda não abriram).
+ * O erro é limitado à categoria de menor peso (0,07) e nunca afeta quem está abaixo do TH14.
+ * Resolver exige um mapa pet→nível da Casa de Pets que os arquivos não fornecem.
+ */
+function fromPets(objects: CsvObject[]): Entry[] {
+  const entries: Entry[] = [];
+
+  for (const object of objects) {
+    const first = object.levels[0];
+    if (!first || !isHomeVillage(first)) continue;
+    if (NON_PET.test(object.name)) continue;
+
+    const levels: LevelSpec[] = [];
+    object.levels.forEach((row, index) => {
+      const cost = asInt(row["UpgradeCost"]);
+      const resource = resourceOf(row, "UpgradeResource");
+      if (cost === null || resource === null) return;
+      levels.push({
+        level: index + 1,
+        cost,
+        resource,
+        buildTimeSec: timeSeconds(row, "UpgradeTime"),
+        minTownHall: PET_UNLOCK_TOWN_HALL,
+      });
+    });
+    if (levels.length === 0) continue;
+
+    entries.push({
+      key: toKey(object.name),
+      name: object.name,
+      ptName: object.name,
+      category: "pet",
+      scoreCategory: "pet",
       village: "home",
       usesBuilder: false,
       levels,
@@ -413,15 +488,7 @@ const catalog: Entry[] = [
     "UpgradeTime",
     "RequiredTownHallLevel",
   ),
-  ...fromDirectLevels(
-    pets,
-    "pet",
-    "pet",
-    "UpgradeCost",
-    "UpgradeResource",
-    "UpgradeTime",
-    "RequiredTownHallLevel",
-  ),
+  ...fromPets(pets),
   ...fromEquipment(equipment),
   ...fromTraps(traps),
 ];
