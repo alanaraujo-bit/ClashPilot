@@ -32,3 +32,6 @@ test-results/
 packages/db/generated/
 
 packages/coc-data/scripts/.cache/
+
+packages/db/prisma/*.sql
+!packages/db/prisma/migrations/**

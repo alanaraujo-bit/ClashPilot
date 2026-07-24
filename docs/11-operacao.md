@@ -17,6 +17,10 @@ Estado em 24/07/2026, fim da Fase 0.
   ou no lockfile (`watchPatterns` em `railway.toml`) — pushes só de documentação não gastam build.
 - **Vercel:** Root Directory = `apps/web`, framework Next.js, região `gru1` (São Paulo).
 - **Healthchecks:** `GET /health` e `GET /health/egress-ip` no gateway.
+- **Worker de sync:** cron no gateway às **03:10 UTC** (`node-cron`) sincroniza todos os
+  jogadores com `syncEnabled`. Gatilho manual: `POST /sync/all` (assinado). Sob demanda:
+  `POST /sync/player/:id`, com throttle de 60 s. É o único escritor do histórico (ADR-001) —
+  snapshot diário idempotente, diff em eventos e payload bruto arquivado em gzip.
 
 ## 2. O IP de saída do Railway **não** é fixo — medido, não suposto
 
@@ -91,14 +95,16 @@ Rotação: a chave é dedicada e revogável no portal. Trocar é
 
 ## 5. Armadilhas já encontradas (para não repetir)
 
-| Sintoma                                                     | Causa                                                                  | Correção aplicada                                                     |
-| ----------------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `ERR_MODULE_NOT_FOUND: packages/core/src/shared/result.js`  | tsup deixou os pacotes do workspace como externos; eles são TS cru     | `noExternal: [/^@clashpilot\//]` em `tsup.config.ts`                  |
-| Healthcheck falha, app "Online" mas `502`                   | Railway injeta `PORT=8080`; o domínio apontava para 4000               | `PORT=4000` fixado como variável                                      |
-| `TypeError: Invalid URL` no build do Next                   | PowerShell escreveu BOM no início da variável na Vercel                | `apps/web/src/lib/env.ts` sanitiza e cai no padrão; coberto por teste |
-| `No Next.js version detected`                               | Root Directory da Vercel apontava para a raiz do monorepo              | Root Directory = `apps/web`, build em auto-detecção                   |
-| `401 assinatura inválida` em todo GET                       | `JSON.stringify(undefined ?? "")` devolve `'""'`, não `''`             | `canonicalBody()` compartilhada + teste de regressão                  |
-| `badSchema: village 'clanCapital'`                          | escopo de achievement não documentado em lugar nenhum                  | `AchievementScope` com degradação para `other`                        |
-| `Module not found: './townhall.js'` só no build de produção | webpack não mapeia `.js` → `.ts`; turbopack e tsc mapeiam              | `extensionAlias` no `next.config.ts`                                  |
-| `PrismaClientInitializationError` em produção, verde local  | com pnpm isolado o engine nativo do Prisma não é copiado para a função | Prisma sem engine: `engineType = "client"` + driver adapter `pg`      |
-| `403 MISSING_OR_NULL_ORIGIN`                                | proteção CSRF do Better Auth (comportamento correto)                   | nada a corrigir — o teste automatizado passou a enviar `Origin`       |
+| Sintoma                                                              | Causa                                                                  | Correção aplicada                                                                            |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `ERR_MODULE_NOT_FOUND: packages/core/src/shared/result.js`           | tsup deixou os pacotes do workspace como externos; eles são TS cru     | `noExternal: [/^@clashpilot\//]` em `tsup.config.ts`                                         |
+| Healthcheck falha, app "Online" mas `502`                            | Railway injeta `PORT=8080`; o domínio apontava para 4000               | `PORT=4000` fixado como variável                                                             |
+| `TypeError: Invalid URL` no build do Next                            | PowerShell escreveu BOM no início da variável na Vercel                | `apps/web/src/lib/env.ts` sanitiza e cai no padrão; coberto por teste                        |
+| `No Next.js version detected`                                        | Root Directory da Vercel apontava para a raiz do monorepo              | Root Directory = `apps/web`, build em auto-detecção                                          |
+| `401 assinatura inválida` em todo GET                                | `JSON.stringify(undefined ?? "")` devolve `'""'`, não `''`             | `canonicalBody()` compartilhada + teste de regressão                                         |
+| `badSchema: village 'clanCapital'`                                   | escopo de achievement não documentado em lugar nenhum                  | `AchievementScope` com degradação para `other`                                               |
+| `Module not found: './townhall.js'` só no build de produção          | webpack não mapeia `.js` → `.ts`; turbopack e tsc mapeiam              | `extensionAlias` no `next.config.ts`                                                         |
+| `PrismaClientInitializationError` em produção, verde local           | com pnpm isolado o engine nativo do Prisma não é copiado para a função | Prisma sem engine: `engineType = "client"` + driver adapter `pg`                             |
+| `403 MISSING_OR_NULL_ORIGIN`                                         | proteção CSRF do Better Auth (comportamento correto)                   | nada a corrigir — o teste automatizado passou a enviar `Origin`                              |
+| Gateway sobe e morre: `Dynamic require of "events" is not supported` | tsup embutiu `pg` (CommonJS com require nativo) no bundle ESM          | `external: ["pg", "@prisma/adapter-pg", "@prisma/client"]` no tsup + deps diretas do gateway |
+| `FST_ERR_CTP_EMPTY_JSON_BODY` ao chamar `/sync/all`                  | POST vazio com `Content-Type: application/json`                        | não é bug — enviar sem content-type; a assinatura cobre corpo vazio                          |
