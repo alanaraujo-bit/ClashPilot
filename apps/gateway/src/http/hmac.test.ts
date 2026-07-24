@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { sign, verify } from "./hmac.js";
+import { canonicalBody, sign, verify } from "./hmac.js";
 
 const secret = "segredo-de-teste-com-32-caracteres";
 const now = 1_800_000_000_000;
@@ -69,6 +69,31 @@ describe("HMAC do gateway", () => {
       base.body,
     );
     expect(verify({ ...base, timestamp, signature })).toEqual({ ok: false, reason: "mismatch" });
+  });
+
+  it("canonicalBody trata ausência de corpo como string vazia", () => {
+    // Regressão: `JSON.stringify(undefined ?? "")` devolve '""' e quebrava todo GET.
+    expect(canonicalBody(undefined)).toBe("");
+    expect(canonicalBody(null)).toBe("");
+    expect(canonicalBody("")).toBe("");
+    expect(canonicalBody("cru")).toBe("cru");
+    expect(canonicalBody({ token: "abc" })).toBe('{"token":"abc"}');
+  });
+
+  it("um GET sem corpo assina igual dos dois lados", () => {
+    const timestamp = String(now);
+    const clientSig = sign(secret, timestamp, "GET", "/players/%232PP", "");
+    expect(
+      verify({
+        secret,
+        timestamp,
+        signature: clientSig,
+        method: "GET",
+        path: "/players/%232PP",
+        body: canonicalBody(undefined),
+        now,
+      }),
+    ).toEqual({ ok: true });
   });
 
   it("é determinístico para a mesma entrada", () => {

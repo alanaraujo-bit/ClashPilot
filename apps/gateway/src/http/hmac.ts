@@ -22,6 +22,19 @@ export function sign(
     .digest("hex");
 }
 
+/**
+ * Forma canônica do corpo para assinatura. Precisa ser idêntica dos dois lados.
+ *
+ * Cuidado que já custou uma sessão de debug: `JSON.stringify(undefined ?? "")` devolve `'""'`
+ * (dois caracteres de aspas), não uma string vazia — o que fazia todo GET sem corpo assinar
+ * algo diferente do que o cliente assinava.
+ */
+export function canonicalBody(body: unknown): string {
+  if (body === undefined || body === null) return "";
+  if (typeof body === "string") return body;
+  return JSON.stringify(body);
+}
+
 export type VerifyResult = { ok: true } | { ok: false; reason: "missing" | "expired" | "mismatch" };
 
 export function verify(params: {

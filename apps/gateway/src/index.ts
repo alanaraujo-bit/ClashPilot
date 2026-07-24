@@ -3,7 +3,7 @@ import { parsePlayerTag } from "@clashpilot/core";
 import { z } from "zod";
 import { CocApiClient } from "./coc/client.js";
 import { loadConfig } from "./config.js";
-import { SIGNATURE_HEADER, TIMESTAMP_HEADER, verify } from "./http/hmac.js";
+import { SIGNATURE_HEADER, TIMESTAMP_HEADER, canonicalBody, verify } from "./http/hmac.js";
 
 const config = loadConfig();
 const coc = new CocApiClient(config);
@@ -52,7 +52,7 @@ app.addHook("preHandler", async (req, reply) => {
     timestamp: req.headers[TIMESTAMP_HEADER] as string | undefined,
     method: req.method,
     path: req.url,
-    body: typeof req.body === "string" ? req.body : JSON.stringify(req.body ?? ""),
+    body: canonicalBody(req.body),
   });
 
   if (!result.ok) {
