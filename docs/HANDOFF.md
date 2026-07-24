@@ -36,10 +36,18 @@ vila `#GR0VR9VGP` (`PHANT0MX`, TH6, subindo pra TH7) é do próprio Alan (não �
 afirmava ("tá tudo full"). O app é que estava errado. O "75%" que ele via era o exército
 (subcontado) puxando; agora bate.
 
-**Pendências:** (a) **nomes em pt-BR** de tropas/feitiços na UI — o CDN só expõe `texts.csv` em EN
-(403 em variantes PT); hoje `name`/`ptName` = nome público EN. Precisa de tabela de tradução curada
-(é texto, não número de balanceamento). (b) validar THs mais altos (heróis, ledger cheio). (c) ideia
-de produto: breakdown por categoria no dashboard, para deixar claro o que segura o progresso.
+**Nomes pt-BR (feito para o núcleo, 2026-07-24):** o CDN só expõe `texts.csv` em EN, então os nomes
+oficiais em português vêm de uma **tabela curada** (`packages/coc-data/scripts/pt-names.ts`, chave→
+pt-BR) montada do próprio `texts.csv` do jogo (coluna PT, mirror datamine Statscell) + Supercell/
+coc.guide para o conteúdo novo. O gerador aplica em `ptName`; `/plano` (motor) e o mapper (unidades
+ao vivo) exibem `ptName` via `displayNameForKey`; sem tradução, cai no EN público. **Cobertura:**
+todas as tropas/feitiços/heróis + parte dos pets. **Pendente (EN por ora):** cerco novo, Ice Block,
+Thrower, 6 pets, 33 equipamentos — tudo bem acima do CV6. Para completar: achar/pesquisar o nome do
+jogo e adicionar em `pt-names.ts`.
+
+**Pendências:** (a) completar a cauda de nomes pt-BR (acima). (b) validar THs mais altos (heróis,
+ledger cheio). (c) ideia de produto: breakdown por categoria no dashboard, para deixar claro o que
+segura o progresso.
 
 ### Como fazer a validação (a tarefa pendente)
 
@@ -183,9 +191,9 @@ Pipeline em `packages/coc-data/scripts/` (baixa, decodifica LZMA, faz cache, tra
   CV6=3 e nível 4=CV7; Raio cap CV6=4.
 - Ponte de nomes API↔catálogo: `GENERATED_API_ALIASES` (mapa `nome-público→chave-interna`, gerado do
   `localization/texts.csv`) + `catalogKeyForApiName`. As unidades (army/hero/pet/equipment) recebem o
-  nome público EN como `name`/`ptName`; o mapper resolve a chave por aí. Sem isso, `Lightning Spell`
-  não casava com `lighningstorm` e o feitiço virava nível 0. `texts.csv` do CDN é **só EN** — nomes
-  pt-BR ficam pendentes (tabela curada).
+  nome público EN como `name`; o mapper resolve a chave por aí. Sem isso, `Lightning Spell` não
+  casava com `lighningstorm` e o feitiço virava nível 0. `ptName` recebe o nome pt-BR oficial da
+  tabela curada `scripts/pt-names.ts` (fallback EN). Exibição via `displayNameForKey`.
 - **Limite conhecido:** entre TH14–TH16 o denominador de pets é otimista (o mapa pet→nível da
   Casa de Pets não existe nos arquivos). Erro na categoria de menor peso (0,07), nulo abaixo de TH14.
 
