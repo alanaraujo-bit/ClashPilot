@@ -1,4 +1,5 @@
-import { GENERATED_CATALOG } from "./generated/catalog.js";
+import { GENERATED_API_ALIASES, GENERATED_CATALOG } from "./generated/catalog.js";
+import { toKey } from "./classification.js";
 import type { CatalogEntry, TownHallLevel } from "./types.js";
 
 /**
@@ -18,6 +19,18 @@ export type Catalog = readonly CatalogEntry[];
 
 export function findEntry(catalog: Catalog, key: string): CatalogEntry | undefined {
   return catalog.find((e) => e.key === key);
+}
+
+/**
+ * Chave do catálogo para uma unidade vinda da API oficial.
+ *
+ * A API usa nomes de exibição (`Lightning Spell`, `Minion`); o catálogo, chaves derivadas dos
+ * nomes internos dos arquivos (`lighningstorm`, `gargoyle`). O mapa de aliases (gerado do
+ * `texts.csv`) faz a ponte; quando o nome já bate, `toKey` sozinho resolve.
+ */
+export function catalogKeyForApiName(name: string): string {
+  const key = toKey(name);
+  return GENERATED_API_ALIASES[key] ?? key;
 }
 
 /** Nível máximo do item liberado num dado Centro de Vila. 0 = não desbloqueado ainda. */

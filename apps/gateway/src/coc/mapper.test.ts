@@ -62,8 +62,10 @@ describe("mapPlayer", () => {
   });
 
   it("reclassifica pets e cercos que vêm dentro de troops", () => {
-    expect(byKey("mighty-yak")?.category).toBe("pet");
-    expect(byKey("wall-wrecker")?.category).toBe("siege");
+    // A chave é a INTERNA do catálogo (nome público da API resolvido via alias): a API manda
+    // 'Mighty Yak'/'Wall Wrecker', o catálogo guarda 'bulldozer'/'siege-machine-ram'.
+    expect(byKey("bulldozer")?.category).toBe("pet");
+    expect(byKey("siege-machine-ram")?.category).toBe("siege");
     expect(byKey("barbarian")?.category).toBe("troop");
   });
 
@@ -72,7 +74,8 @@ describe("mapPlayer", () => {
   });
 
   it("deduplica equipamento que aparece no herói e em heroEquipment", () => {
-    const puppets = profile.units.filter((u) => u.key === "barbarian-puppet");
+    // 'Barbarian Puppet' (API) resolve para a chave interna 'barbarian-crown'.
+    const puppets = profile.units.filter((u) => u.key === "barbarian-crown");
     expect(puppets).toHaveLength(1);
     expect(byKey("giant-gauntlet")?.category).toBe("equipment");
   });

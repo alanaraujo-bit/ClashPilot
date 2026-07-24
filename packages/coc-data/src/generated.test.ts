@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { CATALOG, MAX_TOWN_HALL, TOWN_HALLS, findEntry, maxLevelForTownHall } from "./index.js";
+import {
+  CATALOG,
+  MAX_TOWN_HALL,
+  TOWN_HALLS,
+  catalogKeyForApiName,
+  findEntry,
+  maxLevelForTownHall,
+} from "./index.js";
 
 /**
  * Testes de integridade do catálogo gerado.
@@ -57,6 +64,16 @@ describe("valores travados contra o jogo", () => {
     expect(first?.resource).toBe("commonOre");
   });
 
+  it("o teto de nível respeita o Laboratório do TH — Bárbaro para no 3 no CV6", () => {
+    // Validado contra o export de uma vila TH6 real (Lab 4): Bárbaro vai até o nível 3; o nível 4
+    // exige Lab 5 (= CV7). O `LaboratoryLevel` de um nível está na linha que o DESCREVE (a linha
+    // seguinte à do custo). Ler da linha errada inflava o teto em um nível.
+    expect(maxLevelForTownHall(entry("barbarian"), 6)).toBe(3);
+    expect(levelOf("barbarian", 4).minTownHall).toBe(7);
+    expect(maxLevelForTownHall(entry("lighningstorm"), 6)).toBe(4); // Feitiço Raio: cap 4 no CV6
+    expect(maxLevelForTownHall(entry("wizard"), 6)).toBe(3);
+  });
+
   it("tropa/feitiço é gateado pelo prédio produtor, não só pelo Laboratório", () => {
     // Bug real pego na 1ª validação contra conta TH6: o gating só pelo Lab liberava tropas de
     // elixir negro em THs que nem têm Quartel de Elixir Negro. O unlock verdadeiro vem do prédio
@@ -98,6 +115,22 @@ describe("valores travados contra o jogo", () => {
           expect(level.minTownHall, `${item.key} nível ${level.level}`).toBeGreaterThanOrEqual(7);
         }
       }
+    }
+  });
+
+  it("o nome público da API casa com a chave interna do catálogo", () => {
+    // A API usa nomes de exibição; o catálogo, nomes internos dos arquivos. Sem a ponte, o
+    // Feitiço de Raio do jogador (API: 'Lightning Spell') virava nível 0 no cálculo.
+    expect(catalogKeyForApiName("Lightning Spell")).toBe("lighningstorm");
+    expect(catalogKeyForApiName("Healing Spell")).toBe("healingwave");
+    expect(catalogKeyForApiName("Minion")).toBe("gargoyle");
+    expect(catalogKeyForApiName("Witch")).toBe("warlock");
+    expect(catalogKeyForApiName("P.E.K.K.A")).toBe("pekka");
+    // Quando o nome já bate, passa direto.
+    expect(catalogKeyForApiName("Barbarian")).toBe("barbarian");
+    // E a chave resolvida existe mesmo no catálogo.
+    for (const api of ["Lightning Spell", "Minion", "Witch", "Barbarian"]) {
+      expect(findEntry(CATALOG, catalogKeyForApiName(api)), api).toBeDefined();
     }
   });
 

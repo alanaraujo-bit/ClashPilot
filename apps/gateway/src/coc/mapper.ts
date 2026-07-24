@@ -1,4 +1,4 @@
-import { classifyTroop, toAchievementScope, toKey } from "@clashpilot/coc-data";
+import { catalogKeyForApiName, classifyTroop, toAchievementScope } from "@clashpilot/coc-data";
 import {
   type PlayerAchievement,
   type PlayerProfile,
@@ -28,7 +28,7 @@ interface UnitLike {
 
 function toUnit(dto: UnitLike, category: PlayerUnit["category"]): PlayerUnit {
   return {
-    key: toKey(dto.name),
+    key: catalogKeyForApiName(dto.name),
     name: dto.name,
     level: dto.level,
     category,
@@ -62,7 +62,7 @@ export function mapPlayer(dto: PlayerDto): PlayerProfile {
     maxLevel: number,
     village: "home" | "builderBase",
   ): void => {
-    const key = toKey(name);
+    const key = catalogKeyForApiName(name);
     if (seenEquipment.has(key)) return;
     seenEquipment.add(key);
     units.push({ key, name, level, category: "equipment", village, globalMaxLevel: maxLevel });

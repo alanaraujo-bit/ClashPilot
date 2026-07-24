@@ -271,8 +271,15 @@ function fromLabUpgrades(
     object.levels.forEach((row, index) => {
       const cost = asInt(row["UpgradeCost"]);
       const resource = resourceOf(row, "UpgradeResource");
-      const labLevel = asInt(row["LaboratoryLevel"]);
       if (cost === null || resource === null) return;
+      // O `LaboratoryLevel` de uma linha é o Lab exigido para TER aquele nível; o `UpgradeCost` da
+      // MESMA linha é o custo de subir para o PRÓXIMO. Então o nível de catálogo `index+2` (custo
+      // vindo desta linha) tem seu requisito de Lab na linha SEGUINTE — a que descreve esse nível.
+      // Ler da própria linha subestimava o Lab em um nível e inflava o teto: o gerador dizia
+      // "Bárbaro nível 4 no CV6" quando o jogo exige Lab 5 (= CV7). Descoberto conferindo o export
+      // real de uma vila TH6 (tudo no máximo aparecendo como incompleto).
+      const labRow = object.levels[index + 1] ?? row;
+      const labLevel = asInt(labRow["LaboratoryLevel"]);
       const labTownHall = (labLevel !== null ? labToTownHall.get(labLevel) : null) ?? 1;
       levels.push({
         level: index + 2,
@@ -505,14 +512,35 @@ function fromTraps(objects: CsvObject[]): Entry[] {
 
 // ──────────────────────────────────── Montagem ─────────────────────────────────────
 
-const [characters, spells, heroes, pets, equipment, traps] = await Promise.all([
+const [characters, spells, heroes, pets, equipment, traps, textObjects] = await Promise.all([
   loadAsset(GAME_FINGERPRINT, "characters", cacheDir).then(parseSupercellCsv),
   loadAsset(GAME_FINGERPRINT, "spells", cacheDir).then(parseSupercellCsv),
   loadAsset(GAME_FINGERPRINT, "heroes", cacheDir).then(parseSupercellCsv),
   loadAsset(GAME_FINGERPRINT, "pets", cacheDir).then(parseSupercellCsv),
   loadAsset(GAME_FINGERPRINT, "equipment", cacheDir).then(parseSupercellCsv),
   loadAsset(GAME_FINGERPRINT, "traps", cacheDir).then(parseSupercellCsv),
+  loadAsset(GAME_FINGERPRINT, "texts", cacheDir).then(parseSupercellCsv),
 ]);
+
+/**
+ * Nome PÚBLICO (o mesmo que a API oficial devolve) de cada unidade, resolvido pelo TID via
+ * `localization/texts.csv`. Os arquivos de lógica usam nomes internos crípticos — `Gargoyle`
+ * para o Minion, `Warlock` para a Bruxa, `LighningStorm` para o Feitiço de Raio. A API usa os
+ * nomes de exibição. Sem esta ponte, o mapper do gateway casava `toKey("Lightning Spell")` com
+ * `lighningstorm` — não batia, e o feitiço do jogador virava nível 0. Achado no export de uma
+ * conta real cujo Raio nível 4 aparecia como 0.
+ */
+const enByTid = new Map<string, string>();
+for (const text of textObjects) {
+  const en = asString(text.levels[0]?.["EN"]);
+  if (en) enByTid.set(text.name, en);
+}
+const enByInternalName = new Map<string, string>();
+for (const object of [...characters, ...spells, ...heroes, ...pets, ...equipment]) {
+  const tid = asString(object.levels[0]?.["TID"]);
+  const en = tid ? enByTid.get(tid) : null;
+  if (en) enByInternalName.set(object.name, en);
+}
 
 const catalog: Entry[] = [
   ...fromBuildings(buildingObjects),
@@ -552,6 +580,25 @@ catalog.length = 0;
 catalog.push(...cleaned);
 
 catalog.sort((a, b) => a.key.localeCompare(b.key));
+
+/**
+ * Ponte nome-da-API → chave-do-catálogo. As unidades (exército, herói, pet, equipamento) são
+ * casadas contra o que a API oficial devolve. Adotamos o nome PÚBLICO como `name`/`ptName`
+ * (some o "LighningStorm" da UI) e registramos um alias `toKey(nomePúblico) → chave-interna`
+ * para tudo que difere — sem trocar as chaves internas (não mexe no Village Ledger nem no
+ * histórico). O mapper do gateway resolve a chave por aqui em vez de casar o nome cru.
+ */
+const API_MATCHED: ReadonlySet<string> = new Set(["army", "hero", "pet", "equipment"]);
+const apiAliases: Record<string, string> = {};
+for (const entry of catalog) {
+  if (!API_MATCHED.has(entry.scoreCategory)) continue;
+  const en = enByInternalName.get(entry.name);
+  if (!en) continue;
+  entry.name = en;
+  entry.ptName = en; // pt-BR pendente: o CDN só expõe EN; tradução curada fica para um passo à parte
+  const apiKey = toKey(en);
+  if (apiKey !== entry.key) apiAliases[apiKey] = entry.key;
+}
 
 const byCategory = catalog.reduce<Record<string, number>>((acc, entry) => {
   acc[entry.scoreCategory] = (acc[entry.scoreCategory] ?? 0) + 1;
@@ -595,6 +642,13 @@ export const GENERATED_FINGERPRINT = ${JSON.stringify(GAME_FINGERPRINT)};
 export const GENERATED_AT = ${JSON.stringify(new Date().toISOString())};
 
 export const GENERATED_TOWN_HALLS: readonly TownHallSpec[] = ${JSON.stringify(townHalls, null, 2)};
+
+/** Nome público (chave normalizada da API) → chave interna do catálogo. Ver build-catalog.ts. */
+export const GENERATED_API_ALIASES: Readonly<Record<string, string>> = ${JSON.stringify(
+  Object.fromEntries(Object.entries(apiAliases).sort(([a], [b]) => a.localeCompare(b))),
+  null,
+  2,
+)};
 
 export const GENERATED_CATALOG: readonly CatalogEntry[] = ${JSON.stringify(catalog, null, 2)};
 `;
