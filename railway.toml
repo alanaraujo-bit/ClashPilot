@@ -1,0 +1,20 @@
+# Deploy do apps/gateway no Railway (ADR-001).
+#
+# O gateway é o único processo que fala com a API da Supercell: ele detém o token,
+# tem IP de saída fixo (que precisa estar na allowlist da chave) e, a partir da Fase 6,
+# hospeda o worker de sync diário.
+#
+# A web NÃO é publicada aqui — ela vive na Vercel.
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @clashpilot/gateway build"
+watchPatterns = ["apps/gateway/**", "packages/core/**", "packages/coc-data/**", "pnpm-lock.yaml"]
+
+[deploy]
+startCommand = "node apps/gateway/dist/index.js"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+numReplicas = 1
