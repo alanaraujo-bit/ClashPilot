@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
+import { appUrl } from "@/lib/env";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,8 +9,6 @@ const inter = Inter({
   variable: "--font-inter",
   display: "swap",
 });
-
-const appUrl = process.env["NEXT_PUBLIC_APP_URL"] ?? "https://clashpilot.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
