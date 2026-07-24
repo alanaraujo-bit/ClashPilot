@@ -68,16 +68,26 @@ Custos dessa escolha, explícitos:
 
 **Vercel · clashpilot** — `COC_GATEWAY_URL`, `COC_GATEWAY_SECRET`, `NEXT_PUBLIC_APP_URL`.
 
-## 4. Próximo passo bloqueante: a chave da API
+## 4. Chave da API — ✅ ativa
 
-1. Entrar em https://developer.clashofclans.com → _My Account_ → **Create New Key**.
-2. Nome sugerido: `clashpilot-gateway` (chave dedicada — ver §2).
-3. Na allowlist de IP, colar exatamente: **`45.79.218.79`**
-4. `railway variables --service gateway --set "COC_API_TOKEN=<chave>"`.
-5. Validar: uma tag real deve voltar o perfil normalizado pelo gateway.
+Chave `developer/silver` com allowlist `45.79.218.79`, aplicada em `COC_API_TOKEN` no serviço
+`gateway`. Validada ponta a ponta em 24/07/2026:
 
-Enquanto isso não acontece, o gateway responde `502` com `{"kind":"unauthorized"}` em
-`/players/:tag` — comportamento correto e esperado, não é bug.
+```
+GET /players/%232PP  →  200
+Morgil #2PP · TH8 · 30 unidades · 54 achievements
+escopos: { home: 46, builderBase: 6, clanCapital: 2 }
+```
+
+O caminho completo funciona: Vercel → HMAC → gateway → proxy de IP fixo → Supercell → zod →
+domínio normalizado.
+
+**Prova direta do ADR-006 nesse mesmo payload:** `Barbarian level 5, globalMaxLevel 13` numa
+conta TH8. O `maxLevel` da API é o máximo do jogo, não o do TH — usá-lo como denominador
+mostraria 38% para uma vila que pode estar no máximo do TH8.
+
+Rotação: a chave é dedicada e revogável no portal. Trocar é
+`railway variables --service gateway --set "COC_API_TOKEN=<nova>"` — nada mais no sistema a conhece.
 
 ## 5. Armadilhas já encontradas (para não repetir)
 
@@ -87,3 +97,5 @@ Enquanto isso não acontece, o gateway responde `502` com `{"kind":"unauthorized
 | Healthcheck falha, app "Online" mas `502`                  | Railway injeta `PORT=8080`; o domínio apontava para 4000           | `PORT=4000` fixado como variável                                      |
 | `TypeError: Invalid URL` no build do Next                  | PowerShell escreveu BOM no início da variável na Vercel            | `apps/web/src/lib/env.ts` sanitiza e cai no padrão; coberto por teste |
 | `No Next.js version detected`                              | Root Directory da Vercel apontava para a raiz do monorepo          | Root Directory = `apps/web`, build em auto-detecção                   |
+| `401 assinatura inválida` em todo GET                      | `JSON.stringify(undefined ?? "")` devolve `'""'`, não `''`         | `canonicalBody()` compartilhada + teste de regressão                  |
+| `badSchema: village 'clanCapital'`                         | escopo de achievement não documentado em lugar nenhum              | `AchievementScope` com degradação para `other`                        |
