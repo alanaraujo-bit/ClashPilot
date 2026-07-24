@@ -12,13 +12,21 @@ Idioma do produto e dos commits: **português (pt-BR)**.
 ## 1. TL;DR — onde paramos
 
 Fases **0 a 7 e 6 entregues e no ar** (a ordem de execução não seguiu a numeração do roadmap).
-Tudo commitado e deployado. **99 testes passando**, typecheck strict sem `any`, build verde.
+Tudo commitado e deployado. **101 testes passando**, typecheck strict sem `any`, build verde.
 
-**A única pendência que atravessa tudo:** nenhum número foi conferido contra uma **vila ativa
-real**. Só contra a conta dormente de teste `#2PP` (TH8, sem heróis, sem ledger). Progresso,
-ROI, tempo até o máximo e timeline são internamente consistentes e plausíveis, mas ninguém
-validou olhando o próprio jogo ao lado. **Essa validação é a próxima tarefa e vale mais que
-qualquer feature nova.**
+**Primeira validação contra vila real feita (2026-07-24) — e valeu ouro.** A vila `#GR0VR9VGP`
+(`PHANT0MX`, TH6) é do próprio Alan (não é de teste; NÃO apagar). Rodar o `sanity` nela
+escancarou um **bug de gating no catálogo**: tropas e feitiços de elixir negro (Golem, Bowler,
+Bruxa, Feitiço de Veneno…) apareciam liberados já em ~TH3, porque o gerador gateava só pelo
+nível de Laboratório e ignorava o prédio que PRODUZ a unidade. Um TH6 aparecia "precisando" de
+860k de elixir negro sem ter Quartel de Elixir Negro. **Corrigido** (ver §6): agora o gate usa
+`max(TH do Laboratório, TH do prédio produtor)` via `ProductionBuilding`+`BarrackLevel`/
+`SpellForgeLevel`. Efeito no TH6 real: progresso do exército 1,3% → 10,2%, denominador
+129,7M → 16,6M, upgrades 111 → 33, caminho crítico 157d → 15d, zero elixir negro.
+
+**Pendência que ainda atravessa tudo:** falta o Alan conferir os números finos olhando o jogo
+ao lado (os ~33 upgrades / próxima jogada Goblin 4) e validar THs mais altos com heróis/ledger.
+Cobertura da vila segue em 27,7% porque o Village Ledger de `/vila` está vazio para essa conta.
 
 ### Como fazer a validação (a tarefa pendente)
 
@@ -46,8 +54,8 @@ qualquer feature nova.**
 - **Chave da API do CoC:** ativa, `developer/silver`, allowlist `45.79.218.79` (IP do proxy
   RoyaleAPI). Vive só no Railway em `COC_API_TOKEN`. O gateway sai pelo proxy porque o IP do
   Railway não é fixo (ADR-001, ver `docs/11-operacao.md §2`).
-- **Detalhe:** existe no banco um jogador `#GR0VR9VGP` que **não é de teste nosso** — pode ser
-  um usuário real. NÃO apagar.
+- **Detalhe:** o jogador `#GR0VR9VGP` (`PHANT0MX`, TH6) no banco é a **conta real do Alan** — foi
+  ele quem vinculou. NÃO apagar. É a vila usada na 1ª validação (ver §1).
 
 Detalhes operacionais completos e a lista de armadilhas já resolvidas: **`docs/11-operacao.md`**.
 
@@ -141,8 +149,15 @@ Pipeline em `packages/coc-data/scripts/` (baixa, decodifica LZMA, faz cache, tra
   nível (nível 1 do herói é o altar); tropas/feitiços = upgrade DE N PARA N+1 (nível 1 grátis).
   Travado por testes-âncora em `src/generated.test.ts` — se a Supercell mudar o formato, o CI
   quebra antes do número errado chegar ao usuário.
-- Gating: tropas por Laboratório, equipamentos por Ferraria (`Smithy`, TH8+), pets por Casa de
-  Pets (`Pet Shop`, TH14+). Foi bug real corrigido na Fase 7.
+- Gating (o mais delicado): uma unidade só existe a partir do TH em que o **prédio que a produz**
+  a libera — o Laboratório só destrava os UPGRADES dela. Tropas: `ProductionBuilding` +
+  `BarrackLevel` (Quartel / Quartel de Elixir Negro / SiegeWorkshop). Feitiços: `ProductionBuilding`
+  + `SpellForgeLevel` (Fábrica de Feitiços / Mini Fábrica). Cada nível recebe
+  `minTownHall = max(TH do Laboratório, TH do prédio produtor)`. Equipamentos por Ferraria
+  (`Smithy`, TH8+), pets por Casa de Pets (`Pet Shop`, TH14+). **Corrigido em 2026-07-24** — antes
+  gateava só pelo Laboratório e vazava tropa/feitiço de elixir negro para ~TH3 (achado na 1ª
+  validação real, TH6). Travado por âncoras em `src/generated.test.ts` (Golem=TH8, Bowler=TH10,
+  Poison=TH8, e "nenhum custo de elixir negro antes do TH7").
 - **Limite conhecido:** entre TH14–TH16 o denominador de pets é otimista (o mapa pet→nível da
   Casa de Pets não existe nos arquivos). Erro na categoria de menor peso (0,07), nulo abaixo de TH14.
 

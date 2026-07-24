@@ -208,6 +208,27 @@ const labToTownHall = gateLevelsToTownHall("Laboratory");
 const smithyToTownHall = gateLevelsToTownHall("Smithy");
 const petShopToTownHall = gateLevelsToTownHall("Pet Shop");
 
+/**
+ * TH que destrava a UNIDADE em si, pelo prédio que a PRODUZ.
+ *
+ * Tropas e feitiços não são liberados pelo Laboratório — ele só destrava os UPGRADES de uma
+ * unidade que já existe. A unidade nasce quando o prédio produtor (`ProductionBuilding`)
+ * alcança o nível exigido: `BarrackLevel` para tropas, `SpellForgeLevel` para feitiços. Gatear
+ * só pelo Laboratório fazia o catálogo dizer que um TH6 podia ter Golem, Bowler e Feitiço de
+ * Veneno — um TH6 não tem sequer Quartel de Elixir Negro. Foi o bug que a primeira validação
+ * contra uma conta real (TH6) escancarou: elixir negro brotando num Centro de Vila que não o usa.
+ */
+const productionGateCache = new Map<string, Map<number, number>>();
+function productionUnlockTownHall(building: string | null, level: number | null): number | null {
+  if (!building || level === null) return null;
+  let map = productionGateCache.get(building);
+  if (!map) {
+    map = gateLevelsToTownHall(building);
+    productionGateCache.set(building, map);
+  }
+  return map.get(level) ?? null;
+}
+
 /** TH em que a Casa de Pets aparece — nenhum pet existe antes disso. */
 const PET_UNLOCK_TOWN_HALL = petShopToTownHall.get(1) ?? 14;
 /** TH em que a Ferraria aparece — nenhum equipamento existe antes disso. */
@@ -224,6 +245,7 @@ function fromLabUpgrades(
   objects: CsvObject[],
   category: "troop" | "spell",
   scoreCategory: ScoreCategory,
+  productionLevelColumn: string,
 ): Entry[] {
   const entries: Entry[] = [];
 
@@ -232,24 +254,35 @@ function fromLabUpgrades(
     if (!first || !isHomeVillage(first)) continue;
     if (asString(first["EnabledByCalendar"])) continue; // Super Tropa / evento: não é progresso
 
+    // Piso de destravamento: a unidade só existe a partir do TH em que o prédio produtor a
+    // libera. Nenhum nível dela pode ser mais barato/mais cedo do que isso.
+    const productionTownHall = productionUnlockTownHall(
+      asString(first["ProductionBuilding"]),
+      asInt(first[productionLevelColumn]),
+    );
+
     const levels: LevelSpec[] = [];
     object.levels.forEach((row, index) => {
       const cost = asInt(row["UpgradeCost"]);
       const resource = resourceOf(row, "UpgradeResource");
       const labLevel = asInt(row["LaboratoryLevel"]);
       if (cost === null || resource === null) return;
+      const labTownHall = (labLevel !== null ? labToTownHall.get(labLevel) : null) ?? 1;
       levels.push({
         level: index + 2,
         cost,
         resource,
         buildTimeSec: timeSeconds(row, "UpgradeTime"),
-        minTownHall: (labLevel !== null ? labToTownHall.get(labLevel) : null) ?? 1,
+        // Gate por AMBOS: o Laboratório destrava o upgrade, o quartel destrava a própria unidade.
+        minTownHall: Math.max(labTownHall, productionTownHall ?? 1),
       });
     });
     if (levels.length === 0) continue;
 
-    // Nível 1 existe e é grátis — precisa entrar para o denominador do progresso fechar.
-    const unlockTownHall = asInt(first["TownHallLevel"]) ?? levels[0]?.minTownHall ?? 1;
+    // Nível 1 existe e é grátis — precisa entrar para o denominador do progresso fechar. Ele
+    // aparece exatamente quando o prédio produtor destrava a unidade (não quando o Lab abre).
+    const unlockTownHall =
+      productionTownHall ?? asInt(first["TownHallLevel"]) ?? levels[0]?.minTownHall ?? 1;
     levels.unshift({
       level: 1,
       cost: 0,
@@ -477,8 +510,8 @@ const [characters, spells, heroes, pets, equipment, traps] = await Promise.all([
 
 const catalog: Entry[] = [
   ...fromBuildings(buildingObjects),
-  ...fromLabUpgrades(characters, "troop", "army"),
-  ...fromLabUpgrades(spells, "spell", "army"),
+  ...fromLabUpgrades(characters, "troop", "army", "BarrackLevel"),
+  ...fromLabUpgrades(spells, "spell", "army", "SpellForgeLevel"),
   ...fromDirectLevels(
     heroes,
     "hero",

@@ -57,6 +57,28 @@ describe("valores travados contra o jogo", () => {
     expect(first?.resource).toBe("commonOre");
   });
 
+  it("tropa/feitiço é gateado pelo prédio produtor, não só pelo Laboratório", () => {
+    // Bug real pego na 1ª validação contra conta TH6: o gating só pelo Lab liberava tropas de
+    // elixir negro em THs que nem têm Quartel de Elixir Negro. O unlock verdadeiro vem do prédio
+    // que PRODUZ a unidade (Golem = Dark Elixir Barrack nv4 = TH8; Bowler = nv7 = TH10).
+    expect(levelOf("golem", 1).minTownHall).toBe(8);
+    expect(levelOf("bowler", 1).minTownHall).toBe(10);
+    expect(levelOf("ice-golem", 1).minTownHall).toBe(11);
+    expect(levelOf("poison", 1).minTownHall).toBe(8); // Mini Spell Factory (TH8)
+    expect(levelOf("pekka", 1).minTownHall).toBe(8); // Barrack nv10 (TH8)
+    expect(levelOf("siege-machine-ram", 1).minTownHall).toBe(12); // SiegeWorkshop (TH12)
+  });
+
+  it("nenhum custo em elixir negro aparece antes do TH7 (Quartel de Elixir Negro)", () => {
+    for (const item of CATALOG) {
+      for (const level of item.levels) {
+        if (level.resource === "darkElixir") {
+          expect(level.minTownHall, `${item.key} nível ${level.level}`).toBeGreaterThanOrEqual(7);
+        }
+      }
+    }
+  });
+
   it("os cinco heróis da vila principal estão presentes", () => {
     const heroes = CATALOG.filter((e) => e.category === "hero").map((e) => e.key);
     expect(heroes).toContain("barbarian-king");
