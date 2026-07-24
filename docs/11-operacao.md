@@ -91,11 +91,14 @@ Rotação: a chave é dedicada e revogável no portal. Trocar é
 
 ## 5. Armadilhas já encontradas (para não repetir)
 
-| Sintoma                                                    | Causa                                                              | Correção aplicada                                                     |
-| ---------------------------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| `ERR_MODULE_NOT_FOUND: packages/core/src/shared/result.js` | tsup deixou os pacotes do workspace como externos; eles são TS cru | `noExternal: [/^@clashpilot\//]` em `tsup.config.ts`                  |
-| Healthcheck falha, app "Online" mas `502`                  | Railway injeta `PORT=8080`; o domínio apontava para 4000           | `PORT=4000` fixado como variável                                      |
-| `TypeError: Invalid URL` no build do Next                  | PowerShell escreveu BOM no início da variável na Vercel            | `apps/web/src/lib/env.ts` sanitiza e cai no padrão; coberto por teste |
-| `No Next.js version detected`                              | Root Directory da Vercel apontava para a raiz do monorepo          | Root Directory = `apps/web`, build em auto-detecção                   |
-| `401 assinatura inválida` em todo GET                      | `JSON.stringify(undefined ?? "")` devolve `'""'`, não `''`         | `canonicalBody()` compartilhada + teste de regressão                  |
-| `badSchema: village 'clanCapital'`                         | escopo de achievement não documentado em lugar nenhum              | `AchievementScope` com degradação para `other`                        |
+| Sintoma                                                     | Causa                                                                  | Correção aplicada                                                     |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `ERR_MODULE_NOT_FOUND: packages/core/src/shared/result.js`  | tsup deixou os pacotes do workspace como externos; eles são TS cru     | `noExternal: [/^@clashpilot\//]` em `tsup.config.ts`                  |
+| Healthcheck falha, app "Online" mas `502`                   | Railway injeta `PORT=8080`; o domínio apontava para 4000               | `PORT=4000` fixado como variável                                      |
+| `TypeError: Invalid URL` no build do Next                   | PowerShell escreveu BOM no início da variável na Vercel                | `apps/web/src/lib/env.ts` sanitiza e cai no padrão; coberto por teste |
+| `No Next.js version detected`                               | Root Directory da Vercel apontava para a raiz do monorepo              | Root Directory = `apps/web`, build em auto-detecção                   |
+| `401 assinatura inválida` em todo GET                       | `JSON.stringify(undefined ?? "")` devolve `'""'`, não `''`             | `canonicalBody()` compartilhada + teste de regressão                  |
+| `badSchema: village 'clanCapital'`                          | escopo de achievement não documentado em lugar nenhum                  | `AchievementScope` com degradação para `other`                        |
+| `Module not found: './townhall.js'` só no build de produção | webpack não mapeia `.js` → `.ts`; turbopack e tsc mapeiam              | `extensionAlias` no `next.config.ts`                                  |
+| `PrismaClientInitializationError` em produção, verde local  | com pnpm isolado o engine nativo do Prisma não é copiado para a função | Prisma sem engine: `engineType = "client"` + driver adapter `pg`      |
+| `403 MISSING_OR_NULL_ORIGIN`                                | proteção CSRF do Better Auth (comportamento correto)                   | nada a corrigir — o teste automatizado passou a enviar `Origin`       |

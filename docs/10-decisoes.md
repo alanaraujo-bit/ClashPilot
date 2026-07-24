@@ -114,6 +114,30 @@ via `Intl`.
 **Consequência.** Custo inicial pequeno; abre o mercado de língua inglesa (muito maior) sem
 refatoração.
 
+## ADR-013 — Prisma sem engine nativo (`engineType = "client"`)
+
+**Contexto.** Três deploys seguidos falharam com `PrismaClientInitializationError` em produção
+enquanto tudo passava localmente. Causa raiz: o engine do Prisma é um binário
+(`libquery_engine-*.so.node`) que **não é um `import`** — nenhum bundler o enxerga, e com
+`node-linker=isolated` do pnpm o file tracing da Vercel não segue o symlink para copiá-lo.
+Mexer em `outputFileTracingIncludes`, `serverExternalPackages` e no caminho de saída do
+generator não resolveu: o client procura o engine em caminhos absolutos de _build time_.
+
+**Decisão.** Generator novo `prisma-client` (não `prisma-client-js`) com
+`engineType = "client"` e Driver Adapter `@prisma/adapter-pg`. O client passa a ser
+TypeScript/JavaScript puro; as queries são compiladas em JS e executadas pelo driver `pg`.
+
+**Consequências.**
+
+- (+) A classe de erro deixa de existir: sem binário, não há o que copiar.
+- (+) Cold start menor e o mesmo client roda em qualquer runtime.
+- (+) `DATABASE_URL` é lida explicitamente ao criar o adapter — falha de configuração vira
+  erro claro na inicialização, não `undefined` silencioso.
+- (−) O client gerado é **TypeScript** e precisa de um bundler: `@clashpilot/db` entrou em
+  `transpilePackages` do Next, e um `node script.mjs` avulso **não** consegue importá-lo.
+  Scripts operacionais precisam rodar via bundler (tsup/vitest) ou usar `prisma db execute`.
+- (−) Depende de `pg` como dependência real, não só do Prisma.
+
 ## ADR-011 — PostgreSQL no Railway, colocado com o gateway
 
 **Contexto.** O worker de sync é o maior escritor do sistema (snapshot diário + eventos de todos
