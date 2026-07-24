@@ -9,7 +9,8 @@ Analisa os dados da API oficial, guarda histórico e transforma isso em decisõe
 
 ## Estado atual
 
-🟢 **Fase 0 concluída e no ar.**
+🟢 **Fases 0–7 no ar.** Auth, catálogo oficial do jogo, Village Ledger, motor de prioridades,
+sync diário e timeline — todos deployados. 99 testes passando.
 
 |         |                                                       |
 | ------- | ----------------------------------------------------- |
@@ -17,13 +18,15 @@ Analisa os dados da API oficial, guarda histórico e transforma isso em decisõe
 | Gateway | https://gateway-production-c67a.up.railway.app/health |
 | Deploy  | automático a cada `push` em `main`                    |
 
-Detalhes de infraestrutura, variáveis e o passo bloqueante (chave da API) em
-[docs/11-operacao.md](docs/11-operacao.md).
+> **Continuando o projeto em outro chat? Comece por [docs/HANDOFF.md](docs/HANDOFF.md).**
+> Ele diz exatamente onde paramos e qual é a próxima tarefa (validar os números com uma vila
+> real). Detalhes de operação em [docs/11-operacao.md](docs/11-operacao.md).
 
 ## Documentação
 
 | Doc                                                | Conteúdo                                                  |
 | -------------------------------------------------- | --------------------------------------------------------- |
+| [HANDOFF](docs/HANDOFF.md)                         | **Estado atual e próxima tarefa — leia primeiro**         |
 | [00 — Visão e escopo](docs/00-visao-e-escopo.md)   | Proposta de valor, **reality check da API**, escopo v1    |
 | [01 — API do Clash of Clans](docs/01-api-clash.md) | Resumo de integração (referência completa em `docs/api/`) |
 | [02 — Modelo de dados](docs/02-modelo-de-dados.md) | Schema Prisma, estratégia de histórico                    |
